@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>CleanArchitecture.Template</id>
+    <version>1.0.0</version>
+    <authors>Phan Minh Trieu</authors>
+    <owners>Phan Minh Trieu</owners>
+    <description>Clean Architecture Solution Template with API, Core, Infra, Shared, UseCases, and Tests projects</description>
+    <language>en-US</language>
+    <tags>CleanArchitecture DDD CQRS API</tags>
+    <packageTypes>
+      <packageType name="Template" />
+    </packageTypes>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/your-repo</projectUrl>
+    <readme>README.md</readme>
+  </metadata>
+
+  <files>
+    <!-- include all source files into content -->
+    <file src=".\**" target="content" 
+          exclude="**\bin\**;**\obj\**;**\.git\**;**\.github\**;**\.vs\**;**\.vscode\**;**\*.user;**\nupkgs\**" />
+    <file src="README.md" target="content" />
+  </files>
+</package>

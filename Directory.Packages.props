@@ -1,0 +1,83 @@
+﻿<Project>
+  <ItemGroup>
+    <!-- Azure -->
+    <PackageVersion Include="Azure.Identity" Version="1.13.1" />
+    <!-- Code coverage -->
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <!-- FastEndpoints framework -->
+    <PackageVersion Include="FastEndpoints" Version="6.2.0" />
+    <PackageVersion Include="FastEndpoints.ApiExplorer" Version="2.2.0" />
+    <PackageVersion Include="FastEndpoints.Swagger" Version="6.2.0" />
+    <PackageVersion Include="FastEndpoints.Swagger.Swashbuckle" Version="2.2.0" />
+    <!-- Email -->
+    <PackageVersion Include="MailKit" Version="4.13.0" />
+    <!-- CQRS / Mediator -->
+    <PackageVersion Include="MediatR" Version="13.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+    <!-- ASP.NET Core Testing -->
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
+    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.4.6" />
+    <!-- Entity Framework Core -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
+    <!-- ASP Net Core -->
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+    <!-- Microsoft Extensions -->
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.6" />
+    <!-- Testing frameworks -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
+    <!-- Reporting -->
+    <PackageVersion Include="ReportGenerator" Version="5.4.8" />
+    <!-- Logging -->
+    <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+    <!-- Database driver -->
+    <PackageVersion Include="SQLite" Version="3.13.0" />
+    <!-- Swagger / API Docs -->
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="8.1.1" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Filters" Version="8.1.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+    <PackageVersion Include="MicroElements.Swashbuckle.FluentValidation" Version="6.1.1" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="8.0.7" />
+    <!--Health check-->
+    <PackageVersion Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI" Version="8.0.1" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="8.0.1" />
+    <!--Fluent Validation-->
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.5.1" />
+    <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authorization" Version="8.0.1" />
+    <!-- Aspire -->
+    <!--#if (aspire) -->
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.6.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.3.1" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.12.0" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="9.0.0" />
+    <!--#endif -->
+  </ItemGroup>
+</Project>

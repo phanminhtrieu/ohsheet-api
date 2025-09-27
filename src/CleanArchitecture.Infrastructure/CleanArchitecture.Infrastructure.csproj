@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <!--Use this to call AddIdentity in the ConfigurationServices--> 
+	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
+	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="Microsoft.Extensions.Configuration" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+	  <PackageReference Include="System.Linq.Dynamic.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CleanArchitecture.Core\CleanArchitecture.Core.csproj" />
+  </ItemGroup>
+
+</Project>
