@@ -42,7 +42,7 @@ namespace CleanArchitecture.API
             services.AddCors(options => options.AddPolicy("AllowSpecificOrigin",
              builder => builder
                  .WithOrigins(appSettings.Cors)
-                 .AllowCredentials() // Allow credentials
+                 .AllowCredentials()
                  .AllowAnyHeader()
                  .AllowAnyMethod()));
 
