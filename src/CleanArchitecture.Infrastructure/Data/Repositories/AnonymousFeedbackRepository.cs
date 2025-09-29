@@ -6,7 +6,7 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
 {
     class AnonymousFeedbackRepository : Repository<AnonymousFeedback>, IAnonymousFeedbackRepository
     {
-        protected AnonymousFeedbackRepository(AppDbContext dbContext) : base(dbContext)
+        public AnonymousFeedbackRepository(AppDbContext dbContext) : base(dbContext)
         {
         }
     }

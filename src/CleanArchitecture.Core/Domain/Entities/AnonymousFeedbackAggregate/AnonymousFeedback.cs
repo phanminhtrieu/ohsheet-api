@@ -15,14 +15,16 @@ namespace CleanArchitecture.Core.Domain.Entities.AnonymousFeedbackAggregate
 
         private AnonymousFeedback() { }
 
-        public AnonymousFeedback(AnonymousSubscription subscription, string message)
+        public AnonymousFeedback(AnonymousSubscription subscription, string? message)
         {
             Guard.AgainstNullOrEmpty<AnonymousFeedbackMessageEmptyException>(message);
 
             AnonymousSubscriptionId = subscription.Id;
-            AnonymousSubscription = subscription;
+            AnonymousSubscription = subscription; 
             Message = message;
             CreatedDate = DateTimeOffset.UtcNow;
+
+            AddDomainEvent(new Events.AnonymousFeedbackCreatedEvent(this));
         }
     }
 }

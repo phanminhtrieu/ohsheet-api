@@ -10,4 +10,9 @@
     {
         public const string WELCOME = "Welcome {0} to Oh Sheet, I hope you happy all the time and have a nice day!!"; // TODO: Changes this to html template, can stored in database
     }
+
+    public static class BadRequestMessages 
+    {
+        public const string EMAIL_ALREADY_EXISTS = "Email already exists";
+    }
 }

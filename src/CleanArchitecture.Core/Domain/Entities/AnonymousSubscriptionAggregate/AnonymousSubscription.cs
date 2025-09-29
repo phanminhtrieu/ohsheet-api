@@ -23,11 +23,11 @@ namespace CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate
 
         private AnonymousSubscription() { }
 
-        public AnonymousSubscription(string email, string name) 
+        public AnonymousSubscription(string? email, string? name) 
         { 
             Guard.AgainstNullOrEmpty<AnonymousSubscriptionNameEmptyException>(name);
 
-            Email = new AnonymousSubscriptionEmail(email); // Guard Clause inside
+            Email = new AnonymousSubscriptionEmail(email!); // Guard Clause inside
             Name = name;
             CreatedDate = DateTimeOffset.UtcNow;
             ModifiedDate = DateTimeOffset.UtcNow;
@@ -42,11 +42,10 @@ namespace CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate
             return subscription;
         }
 
-        public AnonymousFeedback AddFeedBack(string message)
+        public AnonymousFeedback AddFeedBack(string? message)
         {
             var feedback = new AnonymousFeedback(this, message);
             _feedback.Add(feedback);
-            ModifiedDate = DateTimeOffset.UtcNow;
 
             return feedback;
         }
@@ -64,6 +63,7 @@ namespace CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate
         public AnonymousSubscriptionEmail(string email) 
         {
             Guard.AgainstNullOrEmpty<AnonymousSubscriptionEmailEmptyException>(email);
+            Guard.AgainstInvalidEmail(email,() => new AnonymousSubscriptionEmailInvalidException(email));
 
             Value = email;
         }

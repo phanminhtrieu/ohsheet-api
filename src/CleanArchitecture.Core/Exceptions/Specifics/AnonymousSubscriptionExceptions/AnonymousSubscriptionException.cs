@@ -9,4 +9,10 @@
     {
         public AnonymousSubscriptionNameEmptyException() : base("Anonymous Subscription name cannot be empty") { }
     }
+
+    public class AnonymousSubscriptionEmailInvalidException : DomainException
+    {
+        public AnonymousSubscriptionEmailInvalidException(): base() { }
+        public AnonymousSubscriptionEmailInvalidException(string email) : base($"Anonymous Subscription email is invalid: {email}") { }
+    }
 }
