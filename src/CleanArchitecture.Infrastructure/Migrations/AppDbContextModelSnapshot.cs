@@ -22,30 +22,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.AnonymousFeedbackAggregate.AnonymousFeedback", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AnonymousSubscriptionId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AnonymousSubscriptionId");
-
-                    b.ToTable("AnonymousFeedbacks", (string)null);
-                });
-
             modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.ApplicationRole", b =>
                 {
                     b.Property<Guid>("Id")
@@ -242,28 +218,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("RefreshTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate.AnonymousSubscription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("ModifiedDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AnonymousSubscriptions", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -367,17 +321,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.AnonymousFeedbackAggregate.AnonymousFeedback", b =>
-                {
-                    b.HasOne("CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate.AnonymousSubscription", "AnonymousSubscription")
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("AnonymousSubscriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AnonymousSubscription");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.BookAggregate.Book", b =>
                 {
                     b.OwnsOne("CleanArchitecture.Core.Domain.Entities.BookAggregate.BookAuthor", "Author", b1 =>
@@ -434,30 +377,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate.AnonymousSubscription", b =>
-                {
-                    b.OwnsOne("CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate.AnonymousSubscriptionEmail", "Email", b1 =>
-                        {
-                            b1.Property<int>("AnonymousSubscriptionId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)")
-                                .HasColumnName("Email");
-
-                            b1.HasKey("AnonymousSubscriptionId");
-
-                            b1.ToTable("AnonymousSubscriptions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AnonymousSubscriptionId");
-                        });
-
-                    b.Navigation("Email")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("CleanArchitecture.Core.Domain.Entities.ApplicationRole", null)
@@ -507,11 +426,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate.AnonymousSubscription", b =>
-                {
-                    b.Navigation("Feedbacks");
                 });
 #pragma warning restore 612, 618
         }

@@ -51,8 +51,6 @@ namespace CleanArchitecture.Infrastructure
             services.AddTransient<IBookRepository, BookRepository>();
             services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddTransient<IAuditLoginRepository, AuditLoginRepository>();
-            services.AddTransient<IAnonymousSubscriptionRepository, AnonymousSubscriptionRepository>();
-            services.AddTransient<IAnonymousFeedbackRepository, AnonymousFeedbackRepository>();
 
             return services;
         }

@@ -1,9 +1,7 @@
 ﻿using CleanArchitecture.Core.Domain.Entities;
-using CleanArchitecture.Core.Domain.Entities.AnonymousFeedbackAggregate;
 using CleanArchitecture.Core.Domain.Entities.AuditLogin;
 using CleanArchitecture.Core.Domain.Entities.BookAggregate;
 using CleanArchitecture.Core.Domain.Entities.RefreshToken;
-using CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate;
 using CleanArchitecture.Infrastructure.Data.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -27,10 +25,6 @@ namespace CleanArchitecture.Infrastructure.Data
 
         // Log
         public DbSet<AuditLogin> AuditLogins { get; set; }
-
-        // Anonymous
-        public DbSet<AnonymousSubscription> AnonymousSubscriptions { get; set;}
-        public DbSet<AnonymousFeedback> AnonymousFeedbacks { get; set; }
 
         // System
         public DbSet<Book> Books { get; set; }

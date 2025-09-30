@@ -20,8 +20,4 @@
     <ProjectReference Include="..\CleanArchitecture.Shared\CleanArchitecture.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Domain\Entities\AnonymousSubscriptionAggregate\Specifications\" />
-  </ItemGroup>
-
 </Project>

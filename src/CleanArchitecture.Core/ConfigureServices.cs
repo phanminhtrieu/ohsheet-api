@@ -1,11 +1,9 @@
-﻿using CleanArchitecture.Core.Interfaces.AnonymousSubscriptionServices;
-using CleanArchitecture.Core.Interfaces.AuditLoginServices;
+﻿using CleanArchitecture.Core.Interfaces.AuditLoginServices;
 using CleanArchitecture.Core.Interfaces.AuthServices;
 using CleanArchitecture.Core.Interfaces.BookServices;
 using CleanArchitecture.Core.Interfaces.CookieServices;
 using CleanArchitecture.Core.Interfaces.MailServices;
 using CleanArchitecture.Core.Interfaces.TokenService;
-using CleanArchitecture.Core.Services.AnonymousSubscriptionServices;
 using CleanArchitecture.Core.Services.AuditLoginSerivces;
 using CleanArchitecture.Core.Services.AuthServices;
 using CleanArchitecture.Core.Services.BookServices;
@@ -28,9 +26,6 @@ namespace CleanArchitecture.Core
 
             // Log
             services.AddTransient<IAuditLoginService, AuditLoginService>();
-
-            // Anonymous
-            services.AddTransient<IAnonymousSubscriptionService, AnonymousSubscriptionService>();
 
             //Book
             services.AddTransient<IListBooksByPagingService, ListBooksByPagingService>();

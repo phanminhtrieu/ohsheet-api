@@ -48,7 +48,7 @@ namespace CleanArchitecture.API
 
             services.AddHttpClient();
             services.AddSwaggerOpenAPI(appSettings);
-            //services.SetupHealthCheck(appSettings);
+            services.SetupHealthCheck(appSettings);
 
             // Json configuration
             services.ConfigureHttpJsonOptions(options =>
