@@ -48,7 +48,6 @@ namespace CleanArchitecture.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork<AppDbContext>>();
 
             // Inject repositories
-            services.AddTransient<IBookRepository, BookRepository>();
             services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddTransient<IAuditLoginRepository, AuditLoginRepository>();
             services.AddTransient<IAnonymousSubscriptionRepository, AnonymousSubscriptionRepository>();

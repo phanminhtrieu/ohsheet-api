@@ -1,11 +1,11 @@
 ﻿using CleanArchitecture.API.Extensions;
 using CleanArchitecture.API.Middlewares;
 using CleanArchitecture.Core.Domain.Authorization;
-using CleanArchitecture.Core.Domain.Entities.BookAggregate;
+using CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure.Services;
 using CleanArchitecture.Shared;
-using CleanArchitecture.UseCases.Books;
+using CleanArchitecture.UseCases.AnonymousSubscription;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
@@ -65,8 +65,8 @@ namespace CleanArchitecture.API
         {
             var mediatRAssemblies = new[]
             {
-                Assembly.GetAssembly(typeof(Book)), // Core Assembly, dont need to register more at this assembly
-                Assembly.GetAssembly(typeof(CreateBookCommand)), // UseCases Assembly, dont need to register more at this assembly
+                Assembly.GetAssembly(typeof(AnonymousSubscription)), // Core Assembly, dont need to register more at this assembly
+                Assembly.GetAssembly(typeof(AnonymousSubscribeCommand)), // UseCases Assembly, dont need to register more at this assembly
             };
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))

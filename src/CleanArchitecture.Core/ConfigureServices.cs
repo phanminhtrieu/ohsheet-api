@@ -1,14 +1,12 @@
 ﻿using CleanArchitecture.Core.Interfaces.AnonymousSubscriptionServices;
 using CleanArchitecture.Core.Interfaces.AuditLoginServices;
 using CleanArchitecture.Core.Interfaces.AuthServices;
-using CleanArchitecture.Core.Interfaces.BookServices;
 using CleanArchitecture.Core.Interfaces.CookieServices;
 using CleanArchitecture.Core.Interfaces.MailServices;
 using CleanArchitecture.Core.Interfaces.TokenService;
 using CleanArchitecture.Core.Services.AnonymousSubscriptionServices;
 using CleanArchitecture.Core.Services.AuditLoginSerivces;
 using CleanArchitecture.Core.Services.AuthServices;
-using CleanArchitecture.Core.Services.BookServices;
 using CleanArchitecture.Core.Services.CookieServices;
 using CleanArchitecture.Core.Services.MailServices;
 using CleanArchitecture.Core.Services.TokenService;
@@ -31,14 +29,6 @@ namespace CleanArchitecture.Core
 
             // Anonymous
             services.AddTransient<IAnonymousSubscriptionService, AnonymousSubscriptionService>();
-
-            //Book
-            services.AddTransient<IListBooksByPagingService, ListBooksByPagingService>();
-            services.AddTransient<IListBooksService, ListBooksService>();
-            services.AddTransient<IGetBookByIdService, GetBookByIdService>();
-            services.AddTransient<ICreateBookService, CreateBookService>();
-            services.AddTransient<IUpdateBookService, UpdateBookService>();
-            services.AddTransient<IDeleteBookService, DeleteBookService>();
 
             // Email
             services.AddTransient<IEmailService, EmailService>();

@@ -195,22 +195,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("AuditLogins", (string)null);
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.BookAggregate.Book", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Books", (string)null);
-                });
-
             modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.RefreshToken.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -376,51 +360,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("AnonymousSubscription");
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.BookAggregate.Book", b =>
-                {
-                    b.OwnsOne("CleanArchitecture.Core.Domain.Entities.BookAggregate.BookAuthor", "Author", b1 =>
-                        {
-                            b1.Property<int>("BookId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)")
-                                .HasColumnName("Author");
-
-                            b1.HasKey("BookId");
-
-                            b1.ToTable("Books");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BookId");
-                        });
-
-                    b.OwnsOne("CleanArchitecture.Core.Domain.Entities.BookAggregate.BookTitle", "Title", b1 =>
-                        {
-                            b1.Property<int>("BookId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)")
-                                .HasColumnName("Title");
-
-                            b1.HasKey("BookId");
-
-                            b1.ToTable("Books");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BookId");
-                        });
-
-                    b.Navigation("Author")
-                        .IsRequired();
-
-                    b.Navigation("Title")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Domain.Entities.RefreshToken.RefreshToken", b =>

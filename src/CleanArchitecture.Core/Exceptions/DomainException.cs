@@ -1,12 +1,18 @@
-﻿namespace CleanArchitecture.Core.Exceptions
+﻿using CleanArchitecture.Shared.Common.Errors;
+using CleanArchitecture.Shared.Common.Exceptions;
+
+namespace CleanArchitecture.Core.Exceptions
 {
-    public class DomainException : Exception
+    public class DomainException : UserFriendlyException
     {
-        public DomainException() { }
-
-        public DomainException(string message) : base(message) { }
-
-        public DomainException(string message, Exception innerException) : base(message, innerException) { }
+        protected DomainException(
+            ErrorCode errorCode,
+            string message,
+            string userFriendlyMessage,
+            Exception? innerException = null)
+            : base(errorCode, message, userFriendlyMessage, innerException)
+        {
+        }
     }
 
 
