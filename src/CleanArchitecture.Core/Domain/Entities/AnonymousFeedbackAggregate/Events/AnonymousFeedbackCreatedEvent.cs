@@ -1,6 +1,9 @@
 ﻿using CleanArchitecture.Core.Common.Constants;
+using CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate.Events;
 using CleanArchitecture.Core.Interfaces.MailServices;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace CleanArchitecture.Core.Domain.Entities.AnonymousFeedbackAggregate.Events
 {
@@ -14,7 +17,9 @@ namespace CleanArchitecture.Core.Domain.Entities.AnonymousFeedbackAggregate.Even
         }
     }
 
-    internal class AnonymousFeedbackCreatedEventHandler(IEmailService _emailService) : INotificationHandler<AnonymousFeedbackCreatedEvent>
+    internal class AnonymousFeedbackCreatedEventHandler(
+        ILogger<AnonymousFeedbackCreatedEventHandler> _logger,
+        IEmailService _emailService) : INotificationHandler<AnonymousFeedbackCreatedEvent>
     {
         public async Task Handle(AnonymousFeedbackCreatedEvent notification, CancellationToken cancellationToken)
         {
@@ -25,7 +30,7 @@ namespace CleanArchitecture.Core.Domain.Entities.AnonymousFeedbackAggregate.Even
                 $"Email: {notification.AnonymousFeedback.AnonymousSubscription.Email.Value},";
 
             // Send an email to admin
-            await _emailService.SendEmailAsync("admin@gmail.com", EmailSubjects.HAVE_NEW_FEEDBACK, message);
+            _ = Task.Run(() => _emailService.SendEmailAsync("admin@gmail.com", EmailSubjects.HAVE_NEW_FEEDBACK, message)); // TODO: remove fire and forget
         }
     }
 }
