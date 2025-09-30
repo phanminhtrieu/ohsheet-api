@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Core.Exceptions;
+using CleanArchitecture.Shared.Common.Exceptions;
 using System.Text.RegularExpressions;
 
 namespace CleanArchitecture.Core.Helper.GaurdClause
@@ -6,7 +7,7 @@ namespace CleanArchitecture.Core.Helper.GaurdClause
     public static class Guard
     {
         public static void AgainstNullOrEmpty<TException>(object argument)
-            where TException : DomainException, new()
+            where TException : UserFriendlyException, new()
         {
             if (argument == null)
             {
@@ -36,7 +37,7 @@ namespace CleanArchitecture.Core.Helper.GaurdClause
         //    }
         //}
 
-        public static void AgainstInvalidEmail(string email, Func<DomainException> exceptionFactory)
+        public static void AgainstInvalidEmail(string email, Func<UserFriendlyException> exceptionFactory)
         {
             if (string.IsNullOrWhiteSpace(email) || !IsValidEmail(email))
             {

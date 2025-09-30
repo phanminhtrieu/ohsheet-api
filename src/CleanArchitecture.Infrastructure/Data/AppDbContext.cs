@@ -1,7 +1,6 @@
 ﻿using CleanArchitecture.Core.Domain.Entities;
 using CleanArchitecture.Core.Domain.Entities.AnonymousFeedbackAggregate;
 using CleanArchitecture.Core.Domain.Entities.AuditLogin;
-using CleanArchitecture.Core.Domain.Entities.BookAggregate;
 using CleanArchitecture.Core.Domain.Entities.RefreshToken;
 using CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate;
 using CleanArchitecture.Infrastructure.Data.Configurations;
@@ -33,14 +32,12 @@ namespace CleanArchitecture.Infrastructure.Data
         public DbSet<AnonymousFeedback> AnonymousFeedbacks { get; set; }
 
         // System
-        public DbSet<Book> Books { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-            builder.ApplyConfiguration(new BookConfiguration());
             builder.ApplyConfiguration(new RefreshTokenConfiguration());
             builder.ApplyConfiguration(new AuditLoginConfiguration());
 

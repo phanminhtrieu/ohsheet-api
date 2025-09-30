@@ -31,4 +31,8 @@
     <ProjectReference Include="..\CleanArchitecture.UseCases\CleanArchitecture.UseCases.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\BackOffice\" />
+  </ItemGroup>
+
 </Project>

@@ -11,12 +11,6 @@ namespace CleanArchitecture.API.Middlewares
             {
                 await next(context);
             }
-            catch (DomainException ex)
-            {
-                _logger.LogError("DomainException: {exception}", ex.Message);
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsync(ex.ToString());
-            }
             catch (Exception ex)
             {
                 _logger.LogError("GlobalExceptionMiddleware: {exception}", ex);
