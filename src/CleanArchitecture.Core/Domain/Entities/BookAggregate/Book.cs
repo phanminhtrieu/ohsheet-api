@@ -13,7 +13,7 @@ namespace CleanArchitecture.Core.Domain.Entities.BookAggregate
     /// In DDD, we dont have a public constructor for an Aggregate Root.
     /// Because we want to enforce the invariants of the Aggregate.
     /// </summary>
-    public class Book : EntityBase<int>, IAggregate
+    public class Book : EntityBase<int>, IAggregateRoot
     {
         public BookTitle Title { get; private set; }
         public BookAuthor Author { get; private set; }

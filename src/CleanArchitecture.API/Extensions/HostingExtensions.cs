@@ -38,7 +38,7 @@ namespace CleanArchitecture.API.Extensions
             app.UseMiddleware<PerformanceMiddleware>();
             app.UseHttpsRedirection();  
             app.UseSwaggerOpenAPI(appSettings);
-            app.ConfigureHealthCheck();
+            //app.ConfigureHealthCheck();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
