@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.Domain.Entities;
 using CleanArchitecture.Core.Domain.Entities.AnonymousFeedbackAggregate;
 using CleanArchitecture.Core.Domain.Entities.AuditLogin;
+using CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate;
 using CleanArchitecture.Core.Domain.Entities.RefreshToken;
 using CleanArchitecture.Core.Domain.Entities.SubscriptionAggregate;
 using CleanArchitecture.Infrastructure.Data.Configurations;
@@ -32,6 +33,11 @@ namespace CleanArchitecture.Infrastructure.Data
         public DbSet<AnonymousFeedback> AnonymousFeedbacks { get; set; }
 
         // System
+        public DbSet<MusicSheet> MusicSheets { get; set; }
+        public DbSet<MusicSheetComment> MusicSheetComments { get; set; }
+        public DbSet<MusicSheetLike> MusicSheetLikes { get; set; }
+        public DbSet<MusicSheetTag> MusicSheetTags {  get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

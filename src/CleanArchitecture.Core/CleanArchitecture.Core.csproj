@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="Azure.Storage.Blobs" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
@@ -22,6 +24,7 @@
 
   <ItemGroup>
     <Folder Include="Domain\Entities\AnonymousSubscriptionAggregate\Specifications\" />
+    <Folder Include="Domain\Entities\MusicSheetAggregate\Specifications\" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,8 @@
 ﻿<Project>
   <ItemGroup>
     <!-- Azure -->
-    <PackageVersion Include="Azure.Identity" Version="1.13.1" />
+    <PackageVersion Include="Azure.Identity" Version="1.17.0" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.26.0" />
     <!-- Code coverage -->
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <!-- FastEndpoints framework -->

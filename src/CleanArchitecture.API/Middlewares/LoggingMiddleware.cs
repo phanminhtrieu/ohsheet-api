@@ -14,13 +14,15 @@ namespace CleanArchitecture.API.Middlewares
             context.Request.EnableBuffering();
             if (await IsApiRequest(context))
             {
-                await LogRequest(context);
-                await LogResponse(context);
+                //await LogRequest(context);
+                //await LogResponse(context);
             }
             else
             {
-                await _next(context);
+                //await _next(context);
             }
+
+            await _next(context);
         }
 
         private async Task<bool> IsApiRequest(HttpContext context)

@@ -18,14 +18,14 @@ namespace CleanArchitecture.API.Controllers.Frontend
         [AllowAnonymous]
         public async Task<IActionResult> Transcribe([FromForm] MusicTranscriptionRequest request, CancellationToken cancellationToken)
         {
-            var midiPath = await _mediator.Send(new MusicTranscribeCommand(request), cancellationToken);
+            var result = await _mediator.Send(new MusicTranscribeCommand(request), cancellationToken);
 
-            if (midiPath == null)
+            if (!result.IsSucceeded)
             {
                 return BadRequest();
             }
 
-            return Ok();
+            return Ok(result);
         }
     }
 }

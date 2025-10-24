@@ -35,7 +35,6 @@ namespace CleanArchitecture.Core.Services.MusicTranscriptionServices
             // Thêm return_base64 field
             content.Add(new StringContent("false"), "return_base64");
 
-            // Gửi request
             var response = await httpClient.PostAsync(url, content);
 
             if (!response.IsSuccessStatusCode)
