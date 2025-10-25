@@ -5,6 +5,7 @@ using CleanArchitecture.Core.Exceptions.Specifics.MusicSheetExceptions;
 using CleanArchitecture.Core.Helper.GaurdClause;
 using CleanArchitecture.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
@@ -48,30 +49,28 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
         private MusicSheet(
             Guid userId,
             int parentId,
-            string title, 
-            string? description, 
-            string? filePath, 
-            long fileSize, 
+            string title,
+            string? description,
+            bool isForked,
             int status,
+            int visibility,
             int viewCount,
             int likeCount,
             int commentCount,
-            int shareCount,
-            bool isForked)
+            int shareCount)
         {
             Guard.AgainstNullOrEmpty<UserIdEmptyException>(userId);
 
             UserId = userId;
             Title = new MusicSheetTitle(title);
             Description = description;
-            FilePath = filePath;
-            FileSize = fileSize;
+            IsForked = isForked;
             Status = (MusicSheetStatus)status;
+            MusicSheetVisibility = (MusicSheetVisibility)visibility;
             ViewCount = viewCount;
             LikeCount = likeCount;
             CommentCount = commentCount;
             ShareCount = shareCount;
-            IsForked = isForked;
 
             CreatedDate = DateTimeOffset.UtcNow;
             ModifiedDate = DateTimeOffset.UtcNow;
@@ -82,28 +81,26 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             int parentId,
             string title,
             string? description,
-            string? filePath,
-            long fileSize,
-            int status,
-            int viewCount,
-            int likeCount,
-            int commentCount,
-            int shareCount,
-            bool isForked)
+            bool isForked,
+            int status = 0,
+            int visibility = 0,
+            int viewCount = 0,
+            int likeCount = 0,
+            int commentCount = 0,
+            int shareCount = 0)
         {
             var sheet = new MusicSheet(
                 userId, 
                 parentId,
                 title, 
                 description, 
-                filePath, 
-                fileSize, 
+                isForked,
                 status, 
+                visibility,
                 viewCount, 
                 likeCount, 
                 commentCount, 
-                shareCount, 
-                isForked);
+                shareCount);
 
             sheet.AddDomainEvent(new MusicSheetCreatedEvent(sheet));
 
@@ -124,16 +121,52 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             ModifiedDate = DateTimeOffset.UtcNow;
         }
 
+        public void SetFilePath(string filePath)
+        {
+            FilePath = filePath;
+            ModifiedDate = DateTimeOffset.UtcNow;
+        }
+
+        public void SetFileSize(long fileSize)
+        {
+            FileSize = fileSize;
+            ModifiedDate = DateTimeOffset.UtcNow;
+        }
+
         public void AddComment(Guid userId, string content)
         {
             var comment = new MusicSheetComment(this, userId, content);
             _comments.Add(comment);
+            CommentCount++;
+            ModifiedDate = DateTimeOffset.UtcNow;
         }
 
         public void AddLike(Guid userId, string content)
         {
             var like = new MusicSheetLike(this, userId);
             _likes.Add(like);
+            LikeCount++;
+            ModifiedDate = DateTimeOffset.UtcNow;
+        }
+
+        public void AddTag(MusicSheetTag tag)
+        {
+            if (_tags.Any(t => t.Id == tag.Id))
+            {
+                return;
+            }
+
+            _tags.Add(tag);
+            ModifiedDate = DateTimeOffset.UtcNow;
+        }
+
+        public void AddTags(IEnumerable<MusicSheetTag> tags)
+        {
+            foreach (var tag in tags)
+            {
+                _tags.Add(tag);
+            }
+            ModifiedDate = DateTimeOffset.UtcNow;
         }
     }
 
