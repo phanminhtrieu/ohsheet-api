@@ -1,10 +1,11 @@
-﻿using CleanArchitecture.Shared.CrossCuttingConcerns.Dtos.Results;
+﻿using CleanArchitecture.Core.Domain.Models.MusicTranscription;
+using CleanArchitecture.Shared.CrossCuttingConcerns.Dtos.Results;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Core.Interfaces.MusicTranscriptionServices
 {
     public interface IMusicTranscriptionService
     {
-        Task<ApiResult<string>> TranscribeAsync(IFormFile file);
+        Task<ApiResult<MusicTranscriptionResponse>> TranscribeAsync(IFormFile file);
     }
 }

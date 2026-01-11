@@ -17,8 +17,7 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
         public MusicSheetTitle Title { get; private set; }
         public int ParentId { get; private set; }
         public string? Description { get; private set; }
-        public string? FilePath { get; private set; } // local or blob
-        public long FileSize { get; private set; }
+        public string? TranscriptionId { get; private set; }
         public MusicSheetStatus Status { get; private set; } // Draft | Published | Deleted
         public MusicSheetVisibility MusicSheetVisibility { get; private set; } // Private | Public
         public MidiBinaryData? MidiData { get; private set; }
@@ -78,29 +77,29 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
 
         public static MusicSheet Create(
             Guid userId,
-            int parentId,
             string title,
             string? description,
-            bool isForked,
-            int status = 0,
-            int visibility = 0,
-            int viewCount = 0,
-            int likeCount = 0,
-            int commentCount = 0,
-            int shareCount = 0)
+            string? transcriptionId)
         {
             var sheet = new MusicSheet(
                 userId, 
-                parentId,
+                0, // ParentId default
                 title, 
                 description, 
-                isForked,
-                status, 
-                visibility,
-                viewCount, 
-                likeCount, 
-                commentCount, 
-                shareCount);
+                false, // IsForked default
+                0, // Status default (Draft)
+                0, // Visibility default (Private)
+                0, // ViewCount
+                0, // LikeCount
+                0, // CommentCount
+                0); // ShareCount
+
+            if (!string.IsNullOrEmpty(transcriptionId))
+            {
+                sheet.SetTranscriptionId(transcriptionId);
+            }
+
+            // TODO: attach binary midi file
 
             sheet.AddDomainEvent(new MusicSheetCreatedEvent(sheet));
 
@@ -117,19 +116,13 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
         public void AttachBinary(byte[] data)
         {
             MidiData = new MidiBinaryData(data);
-            FileSize = data.Length;
+
             ModifiedDate = DateTimeOffset.UtcNow;
         }
 
-        public void SetFilePath(string filePath)
+        public void SetTranscriptionId(string transcriptionId)
         {
-            FilePath = filePath;
-            ModifiedDate = DateTimeOffset.UtcNow;
-        }
-
-        public void SetFileSize(long fileSize)
-        {
-            FileSize = fileSize;
+            TranscriptionId = transcriptionId;
             ModifiedDate = DateTimeOffset.UtcNow;
         }
 

@@ -7,5 +7,6 @@ namespace CleanArchitecture.Core.Interfaces.MusicSheetServices
     {
         Task<ApiResult<MusicSheetResponse>> GetMusicSheetByIdAsync(int id);
         Task<ApiResult<int>> CreateMusicSheetAsync(MusicSheetRequest request, CancellationToken cancellationToken);
+        Task<FileResponse> ExportToImageAsync(string htmlContent);
     }
 }

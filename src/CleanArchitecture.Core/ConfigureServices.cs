@@ -33,6 +33,7 @@ namespace CleanArchitecture.Core
 
             // Python services
             services.AddTransient<IMusicTranscriptionService, MusicTranscriptionService>();
+            services.AddTransient<ITranscriptionFileService, TranscriptionFileService>();
 
             // Anonymous
             services.AddTransient<IAnonymousSubscriptionService, AnonymousSubscriptionService>();

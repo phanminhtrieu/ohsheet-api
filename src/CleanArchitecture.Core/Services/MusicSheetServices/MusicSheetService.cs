@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate;
+﻿using CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate;
 using CleanArchitecture.Core.Domain.Models.MusicSheet;
 using CleanArchitecture.Core.Interfaces.FileStorageService;
 using CleanArchitecture.Core.Interfaces.MusicSheetServices;
@@ -8,16 +7,14 @@ using CleanArchitecture.Core.UnitOfWork;
 using CleanArchitecture.Shared.Common.Errors;
 using CleanArchitecture.Shared.Common.Exceptions;
 using CleanArchitecture.Shared.CrossCuttingConcerns.Dtos.Results;
-using System.Net.WebSockets;
+using PuppeteerSharp;
 
 namespace CleanArchitecture.Core.Services.MusicSheetServices
 {
     public class MusicSheetService(
         IMusicSheetRepository _musicSheetRepository,
-        IUnitOfWork _unitOfWork,
-        IFileStorageService _fileStorageService) : IMusicSheetService
+        IUnitOfWork _unitOfWork) : IMusicSheetService
     {
-
         public async Task<ApiResult<MusicSheetResponse>> GetMusicSheetByIdAsync(int id)
         {
             var musicSheet = await _musicSheetRepository.FindByIdAsync(id);
@@ -34,8 +31,7 @@ namespace CleanArchitecture.Core.Services.MusicSheetServices
                 Title = musicSheet.Title,
                 ParentId = musicSheet.ParentId,
                 Description = musicSheet.Description,
-                FilePath = musicSheet.FilePath,
-                FileSize = musicSheet.FileSize,
+                TranscriptionId = musicSheet.TranscriptionId,
                 Status = musicSheet.Status,
                 MusicSheetVisibility = musicSheet.MusicSheetVisibility,
                 MidiData = musicSheet.MidiData,
@@ -58,45 +54,58 @@ namespace CleanArchitecture.Core.Services.MusicSheetServices
         {
             var musicSheet = MusicSheet.Create(
                request.UserId,
-               request.ParentId,
                request.Title,
                request.Description,
-               request.IsForked,
-               request.Status,
-               request.MusicSheetVisibility
+               request.TranscriptionId
            );
-
-            if (request.Tags != null)
-            {
-                bool isExistingTag = request.Tags != null && request.Tags.Any();
-
-                if (isExistingTag)
-                {
-                    musicSheet.AddTags(request.Tags!);
-                }
-            }
-
-            if (request.MidiFile != null)
-            {
-                byte[] midiBytes;
-                using (var memoryStream = new MemoryStream())
-                {
-                    await request.MidiFile.CopyToAsync(memoryStream);
-                    midiBytes = memoryStream.ToArray();
-                }
-
-                musicSheet.AttachBinary(midiBytes);
-
-                string filePath = await  _fileStorageService.SaveMidiFileAsync(request.UserId, midiBytes);
-                musicSheet.SetFilePath(filePath);
-
-                long fileSize = await _fileStorageService.GetFileSizeAsync(filePath);
-                musicSheet.SetFileSize(fileSize);
-            }
 
             await _musicSheetRepository.AddAsync(musicSheet);
 
             return new ApiSuccessResult<int>(await _unitOfWork.SaveChangesAsync());
+        }
+
+        public async Task<FileResponse> ExportToImageAsync(string htmlContent)
+        {
+            try
+            {
+                var browserFetcher = new BrowserFetcher();
+                await browserFetcher.DownloadAsync(); 
+
+                await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+                {
+                    Headless = true,
+                    Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" }
+                });
+
+                await using var page = await browser.NewPageAsync();
+
+                // Set content
+                await page.SetContentAsync(htmlContent);
+
+                // ✅ Tùy chọn: tự động lấy kích thước trang để screenshot full page
+                var width = await page.EvaluateExpressionAsync<int>("document.body.scrollWidth"); // ✅
+                var height = await page.EvaluateExpressionAsync<int>("document.body.scrollHeight"); // ✅
+
+                await page.SetViewportAsync(new()
+                {
+                    Width = width,  
+                    Height = height 
+                });
+
+                // Screenshot
+                var screenshotOptions = new ScreenshotOptions
+                {
+                    Type = ScreenshotType.Png,
+                    FullPage = true
+                };
+
+                var bytes = await page.ScreenshotDataAsync(screenshotOptions);
+                return new FileResponse { File = bytes };
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException(ErrorCode.Internal, ex.Message, "Failed to export music sheet to image", ex);
+            }
         }
     }
 }

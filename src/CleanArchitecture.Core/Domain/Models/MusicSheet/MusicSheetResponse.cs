@@ -10,8 +10,7 @@ namespace CleanArchitecture.Core.Domain.Models.MusicSheet
         public MusicSheetTitle Title { get;  set; }
         public int ParentId { get; set; }
         public string? Description { get; set; }
-        public string? FilePath { get; set; } // local or blob
-        public long FileSize { get; set; }
+        public string? TranscriptionId { get; set; }
         public MusicSheetStatus Status { get; set; } // Draft | Published | Deleted
         public MusicSheetVisibility MusicSheetVisibility { get; set; } // Private | Public
         public MidiBinaryData? MidiData { get;  set; }
