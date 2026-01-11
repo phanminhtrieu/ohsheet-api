@@ -1,7 +1,8 @@
 ﻿<Project>
   <ItemGroup>
     <!-- Azure -->
-    <PackageVersion Include="Azure.Identity" Version="1.13.1" />
+    <PackageVersion Include="Azure.Identity" Version="1.17.0" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.26.0" />
     <!-- Code coverage -->
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <!-- FastEndpoints framework -->
@@ -17,6 +18,7 @@
     <!-- ASP.NET Core Testing -->
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.6" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
+    <PackageVersion Include="PuppeteerSharp" Version="20.2.5" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
     <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.4.6" />
     <!-- Entity Framework Core -->

@@ -11,6 +11,7 @@ namespace CleanArchitecture.Shared
         public MailConfigurations MailConfigurations { get; set; }
         public FileStorageSettings FileStorageSettings { get; set; }
         public CloudinarySettings Cloudinary { get; set; }
+        public PythonServiceSettings PythonServiceSettings { get; set; }
         public bool UseInMemoryDatabase { get; set; }
         public string[] Cors { get; set; }
         public string BaseURL { get; set; }
@@ -83,5 +84,12 @@ namespace CleanArchitecture.Shared
         public bool LocalStorage { get; set; } = true;
         [Required]
         public string Path { get; set; }
+    }
+
+    public class PythonServiceSettings
+    {
+        public string BaseUrl { get; set; } = string.Empty;
+        public string InputFolder { get; set; } = string.Empty;
+        public string OutputFolder { get; set; } = string.Empty;
     }
 }

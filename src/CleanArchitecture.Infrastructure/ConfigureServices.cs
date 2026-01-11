@@ -1,9 +1,15 @@
 ﻿using CleanArchitecture.Core.Domain.Entities;
+using CleanArchitecture.Core.Interfaces.FileStorageService;
+using CleanArchitecture.Core.Interfaces.MusicSheetServices;
 using CleanArchitecture.Core.Repositories;
 using CleanArchitecture.Core.UnitOfWork;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.Data.Repositories;
 using CleanArchitecture.Infrastructure.Data.UnitOfWork;
+using CleanArchitecture.Infrastructure.Services.AzureBlob;
+using CleanArchitecture.Infrastructure.Services.BackgroundJobs.MusicSheetViewCounter;
+using CleanArchitecture.Infrastructure.Services.Caching;
+using CleanArchitecture.Infrastructure.Services.FileStorangeServices;
 using CleanArchitecture.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -47,11 +53,23 @@ namespace CleanArchitecture.Infrastructure
             // Inject unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork<AppDbContext>>();
 
+            // Inject service providers
+            services.AddTransient<IAzureBlobService, AzureBlobService>();
+
+            // File Storage Services
+            services.AddTransient<IFileStorageService, FileStorageService>();
+
+            // Inject Caching and Background Job Services
+            services.AddHostedService<ViewCounterBackgroundService>();
+            services.AddSingleton<IViewCounterCacheService, ViewCounterCacheService>();
+
+
             // Inject repositories
             services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddTransient<IAuditLoginRepository, AuditLoginRepository>();
             services.AddTransient<IAnonymousSubscriptionRepository, AnonymousSubscriptionRepository>();
             services.AddTransient<IAnonymousFeedbackRepository, AnonymousFeedbackRepository>();
+            services.AddTransient<IMusicSheetRepository, MusicSheetRepository>();
 
             return services;
         }
