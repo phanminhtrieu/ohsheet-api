@@ -168,6 +168,7 @@ namespace CleanArchitecture.Core.Services.AuthServices
         {
             var response = new UserSignInResponse
             {
+                Id = user.Id,
                 UserName = user.UserName!,
                 Email = user.Email,
                 FirstName = user.FirstName,
