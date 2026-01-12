@@ -1,6 +1,8 @@
 ﻿using CleanArchitecture.Core.Domain.Entities;
+using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.FileStorageService;
 using CleanArchitecture.Core.Interfaces.MusicSheetServices;
+using CleanArchitecture.Core.Interfaces.UserServices;
 using CleanArchitecture.Core.Repositories;
 using CleanArchitecture.Core.UnitOfWork;
 using CleanArchitecture.Infrastructure.Data;
@@ -9,10 +11,9 @@ using CleanArchitecture.Infrastructure.Data.UnitOfWork;
 using CleanArchitecture.Infrastructure.Services.AzureBlob;
 using CleanArchitecture.Infrastructure.Services.BackgroundJobs.MusicSheetViewCounter;
 using CleanArchitecture.Infrastructure.Services.Caching;
-using CleanArchitecture.Infrastructure.Services.FileStorangeServices;
-using CleanArchitecture.Shared;
-using CleanArchitecture.Core.Interfaces.UserServices;
+using CleanArchitecture.Infrastructure.Services.FileStorageServices;
 using CleanArchitecture.Infrastructure.Services.UserServices;
+using CleanArchitecture.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,7 +60,20 @@ namespace CleanArchitecture.Infrastructure
             services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             // Inject service providers
-            services.AddTransient<IAzureBlobService, AzureBlobService>();
+            if (appSettings.FileStorageSettings.LocalStorage)
+            {
+                services.AddTransient<IBlobService, LocalStorageBlobService>();
+            }
+            else
+            {
+                services.Configure<AzureBlobSettings>(options =>
+                {
+                    options.ConnectionString = appSettings.AzureBlob.ConnectionString;
+                    options.AccountName = appSettings.AzureBlob.AccountName;
+                    options.ContainerName = appSettings.AzureBlob.ContainerName;
+                });
+                services.AddTransient<IBlobService, AzureBlobService>();
+            }
 
             // File Storage Services
             services.AddTransient<IFileStorageService, FileStorageService>();

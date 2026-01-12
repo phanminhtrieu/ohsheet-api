@@ -51,7 +51,7 @@ namespace CleanArchitecture.API.Controllers.Frontend
         /// <param name="cancellationToken"></param> 
         /// <returns></returns>
         [HttpPost()]
-        public async Task<IActionResult> CreateMusicSheet([FromBody] MusicSheetRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateMusicSheet([FromForm] MusicSheetRequest request, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new CreateMusicSheetCommand(request), cancellationToken);
 
@@ -62,7 +62,6 @@ namespace CleanArchitecture.API.Controllers.Frontend
 
             return Ok(result);
         }
-
 
         /// <summary>
         /// Export sheet by html

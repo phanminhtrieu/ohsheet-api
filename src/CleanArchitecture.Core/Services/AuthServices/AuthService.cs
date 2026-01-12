@@ -46,17 +46,8 @@ namespace CleanArchitecture.Core.Services.AuthServices
 
         public bool Logout()
         {
-            try
-            {
-                _ = _cookieService.Get();
-                _cookieService.Delete();
-
-                return true;
-            }
-            catch 
-            {
-                throw UserException.InternalServerException();
-            }
+            _cookieService.Delete();
+            return true;
         }
 
         public async Task<ApiResult<string>> RefreshToken()

@@ -1,5 +1,4 @@
-﻿using CleanArchitecture.Core.Domain.Entities;
-using CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate;
+﻿using CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate;
 using CleanArchitecture.Core.Domain.Models.MusicSheet;
 using CleanArchitecture.Core.Repositories;
 using CleanArchitecture.Infrastructure.Data.UnitOfWork;
@@ -17,7 +16,7 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
             _context = dbContext;
         }
 
-        public async Task<DataTablePagedResult<MusicSheetResponse>> ListByPagingAsync(MusicSheetPagingRequest request, CancellationToken cancellationToken)
+        public async Task<DataTablePagedResult<MusicSheetResponse>> ListByPagingAsync(MusicSheetPagingRequest request, Guid? userId, CancellationToken cancellationToken)
         {
             var musicSheetQuery = _context.MusicSheets.AsNoTracking().AsQueryable();
             var userQuery = _context.ApplicatioUsers.AsNoTracking().AsQueryable();
@@ -62,6 +61,7 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                     ParentId = x.ms.ParentId,
                     Description = x.ms.Description,
                     TranscriptionId = x.ms.TranscriptionId,
+                    Thumbnail = x.ms.Thumbnail,
                     Status = x.ms.Status,
                     MusicSheetVisibility = x.ms.MusicSheetVisibility,
                     ViewCount = x.ms.ViewCount,
@@ -72,14 +72,18 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                     CreatedDate = x.ms.CreatedDate,
                     ModifiedDate = x.ms.ModifiedDate,
                     UploaderName = x.u != null ? (x.u.FirstName + " " + x.u.LastName).Trim() : string.Empty,
-                    UploaderAvatar = x.u != null ? x.u.Avatar : string.Empty
+                    UploaderAvatar = x.u != null ? x.u.Avatar : string.Empty,
+                    MusicSheetUIState = new MusicSheetUIState
+                    {
+                        IsLiked = userId.HasValue && x.ms.Likes.Any(l => l.UserId == userId.Value)
+                    }
                 })
                 .ToListAsync(cancellationToken);
 
             return new DataTablePagedResult<MusicSheetResponse>(items, pageIndex, pageSize, totalRecords);
         }
 
-        public async Task<MusicSheetResponse?> GetDetailByIdAsync(int id)
+        public async Task<MusicSheetResponse?> GetDetailByIdAsync(int id, Guid? userId)
         {
             var musicSheetQuery = _context.MusicSheets.AsNoTracking().AsQueryable();
             var userQuery = _context.ApplicatioUsers.AsNoTracking().AsQueryable();
@@ -95,6 +99,7 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                             ParentId = ms.ParentId,
                             Description = ms.Description,
                             TranscriptionId = ms.TranscriptionId,
+                            Thumbnail = ms.Thumbnail,
                             Status = ms.Status,
                             MusicSheetVisibility = ms.MusicSheetVisibility,
                             MidiData = ms.MidiData,
@@ -108,7 +113,11 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                             CreatedDate = ms.CreatedDate,
                             ModifiedDate = ms.ModifiedDate,
                             UploaderName = u != null ? (u.FirstName + " " + u.LastName).Trim() : string.Empty,
-                            UploaderAvatar = u != null ? u.Avatar : string.Empty
+                            UploaderAvatar = u != null ? u.Avatar : string.Empty,
+                            MusicSheetUIState = new MusicSheetUIState
+                            {
+                                IsLiked = userId.HasValue && ms.Likes.Any(l => l.UserId == userId.Value)
+                            }
                         };
 
             return await query.FirstOrDefaultAsync();

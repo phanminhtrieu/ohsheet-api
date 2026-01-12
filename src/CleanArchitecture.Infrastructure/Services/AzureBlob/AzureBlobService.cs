@@ -1,33 +1,42 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
-using CleanArchitecture.Infrastructure.Services.AzureBlob.Models;
-using Microsoft.AspNetCore.Http;
+using Azure.Storage.Blobs.Models;
+using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Shared;
 using Microsoft.Extensions.Options;
 
 namespace CleanArchitecture.Infrastructure.Services.AzureBlob
 {
-    public class AzureBlobService : IAzureBlobService
+    public class AzureBlobService : IBlobService
     {
         private readonly BlobContainerClient _containerClient;
+        private readonly AzureBlobSettings _settings;
 
         public AzureBlobService(IOptions<AzureBlobSettings> options)
         {
-            var settings = options.Value;
+            _settings = options.Value;
 
-            // Tự động xác thực bằng Entra ID / Managed Identity / Azure CLI / VS Login
-            var credential = new DefaultAzureCredential();
+            if (!string.IsNullOrEmpty(_settings.ConnectionString))
+            {
+                _containerClient = new BlobContainerClient(_settings.ConnectionString, _settings.ContainerName);
+            }
+            else
+            {
+                // Tự động xác thực bằng Entra ID / Managed Identity / Azure CLI / VS Login
+                var credential = new DefaultAzureCredential();
 
-            var containerUri = new Uri($"https://{settings.AccountName}.blob.core.windows.net/{settings.ContainerName}");
-            _containerClient = new BlobContainerClient(containerUri, credential);
+                var containerUri = new Uri($"https://{_settings.AccountName}.blob.core.windows.net/{_settings.ContainerName}");
+                _containerClient = new BlobContainerClient(containerUri, credential);
+            }
         }
 
-        // Upload file từ IFormFile
-        public async Task<string> UploadAsync(IFormFile file)
+        // Upload file từ Stream
+        public async Task<string> UploadAsync(Stream stream, string fileName, string contentType)
         {
-            var blobClient = _containerClient.GetBlobClient(file.FileName);
+            var blobClient = _containerClient.GetBlobClient(fileName);
 
-            using var stream = file.OpenReadStream();
-            await blobClient.UploadAsync(stream, overwrite: true);
+            var blobHttpHeader = new BlobHttpHeaders { ContentType = contentType };
+            await blobClient.UploadAsync(stream, new BlobUploadOptions { HttpHeaders = blobHttpHeader });
 
             return blobClient.Uri.ToString(); // Trả về URL public hoặc dùng để tải
         }
@@ -60,6 +69,13 @@ namespace CleanArchitecture.Infrastructure.Services.AzureBlob
         {
             var blobClient = _containerClient.GetBlobClient(blobName);
             await blobClient.DeleteIfExistsAsync();
+        }
+
+        // Lấy URL của blob
+        public string GetBlobUrl(string blobName)
+        {
+            var blobClient = _containerClient.GetBlobClient(blobName);
+            return blobClient.Uri.ToString();
         }
     }
 }

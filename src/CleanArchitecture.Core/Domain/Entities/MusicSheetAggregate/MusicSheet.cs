@@ -5,7 +5,6 @@ using CleanArchitecture.Core.Exceptions.Specifics.MusicSheetExceptions;
 using CleanArchitecture.Core.Helper.GaurdClause;
 using CleanArchitecture.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
@@ -18,6 +17,7 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
         public int ParentId { get; private set; }
         public string? Description { get; private set; }
         public string? TranscriptionId { get; private set; }
+        public string? Thumbnail { get; private set; }
         public MusicSheetStatus Status { get; private set; } // Draft | Published | Deleted
         public MusicSheetVisibility MusicSheetVisibility { get; private set; } // Private | Public
         public MidiBinaryData? MidiData { get; private set; }
@@ -50,6 +50,7 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             int parentId,
             string title,
             string? description,
+            string? thumbnail,
             bool isForked,
             int status,
             int visibility,
@@ -63,6 +64,7 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             UserId = userId;
             Title = new MusicSheetTitle(title);
             Description = description;
+            Thumbnail = thumbnail;
             IsForked = isForked;
             Status = (MusicSheetStatus)status;
             MusicSheetVisibility = (MusicSheetVisibility)visibility;
@@ -79,13 +81,15 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             Guid userId,
             string title,
             string? description,
-            string? transcriptionId)
+            string? transcriptionId,
+            string? thumbnail = null)
         {
             var sheet = new MusicSheet(
                 userId, 
                 0, // ParentId default
                 title, 
                 description, 
+                thumbnail,
                 false, // IsForked default
                 (int)MusicSheetStatus.Published, // Status default
                 (int)MusicSheetVisibility.Public, // Visibility default
@@ -104,6 +108,12 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             sheet.AddDomainEvent(new MusicSheetCreatedEvent(sheet));
 
             return sheet;
+        }
+
+        public void SetThumbnail(string thumbnail)
+        {
+            Thumbnail = thumbnail;
+            ModifiedDate = DateTimeOffset.UtcNow;
         }
 
         public void UpdateMetadata(string title, string description)

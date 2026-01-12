@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate;
 using CleanArchitecture.Core.Domain.Models.MusicSheet;
+using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.MusicSheetServices;
 using CleanArchitecture.Core.Interfaces.UserServices;
 using CleanArchitecture.Core.Repositories;
@@ -15,11 +16,12 @@ namespace CleanArchitecture.Core.Services.MusicSheetServices
     public class MusicSheetService(
         IMusicSheetRepository _musicSheetRepository,
         IUnitOfWork _unitOfWork,
-        ICurrentUserService _currentUserService) : IMusicSheetService
+        ICurrentUserService _currentUserService,
+        IBlobService _blobService) : IMusicSheetService
     {
         public async Task<ApiResult<MusicSheetResponse>> GetMusicSheetByIdAsync(int id)
         {
-            var musicSheetResponse = await _musicSheetRepository.GetDetailByIdAsync(id);
+            var musicSheetResponse = await _musicSheetRepository.GetDetailByIdAsync(id, _currentUserService.UserGuid);
 
             if (musicSheetResponse == null) throw new UserFriendlyException(
                 ErrorCode.NotFound,
@@ -33,18 +35,26 @@ namespace CleanArchitecture.Core.Services.MusicSheetServices
 
         public async Task<ApiResult<DataTablePagedResult<MusicSheetResponse>>> ListByPagingAsync(MusicSheetPagingRequest request, CancellationToken cancellationToken)
         {
-            var pagedResult = await _musicSheetRepository.ListByPagingAsync(request, cancellationToken);
+            var pagedResult = await _musicSheetRepository.ListByPagingAsync(request, _currentUserService.UserGuid, cancellationToken);
 
             return new ApiSuccessResult<DataTablePagedResult<MusicSheetResponse>>(pagedResult);
         }
 
         public async Task<ApiResult<int>> CreateMusicSheetAsync(MusicSheetRequest request, CancellationToken cancellationToken)
         {
+            string? thumbnailUrl = null;
+            if (request.ThumbnailFile != null)
+            {
+                using var stream = request.ThumbnailFile.OpenReadStream();
+                thumbnailUrl = await _blobService.UploadAsync(stream, request.ThumbnailFile.FileName, request.ThumbnailFile.ContentType);
+            }
+
             var musicSheet = MusicSheet.Create(
                request.UserId,
                request.Title,
                request.Description,
-               request.TranscriptionId
+               request.TranscriptionId,
+               thumbnailUrl
            );
 
             await _musicSheetRepository.AddAsync(musicSheet);
