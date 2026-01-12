@@ -1,7 +1,7 @@
 ﻿using CleanArchitecture.Core.Interfaces.FileStorageService;
 using CleanArchitecture.Shared;
 
-namespace CleanArchitecture.Infrastructure.Services.FileStorangeServices
+namespace CleanArchitecture.Infrastructure.Services.FileStorageServices
 {
     public class FileStorageService(AppSettings _appSettings) : IFileStorageService
     {

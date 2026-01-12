@@ -6,11 +6,13 @@ namespace CleanArchitecture.Core.Domain.Models.MusicSheet
     public class MusicSheetResponse
     {
         public int Id { get; set; }
-        public Guid UserId { get; set; }
-        public MusicSheetTitle Title { get;  set; }
+        public string Title { get;  set; }
+        public string UploaderName { get; set; } = string.Empty;
+        public string UploaderAvatar { get; set; } = string.Empty;
         public int ParentId { get; set; }
         public string? Description { get; set; }
         public string? TranscriptionId { get; set; }
+        public string? Thumbnail { get; set; }
         public MusicSheetStatus Status { get; set; } // Draft | Published | Deleted
         public MusicSheetVisibility MusicSheetVisibility { get; set; } // Private | Public
         public MidiBinaryData? MidiData { get;  set; }
@@ -25,5 +27,6 @@ namespace CleanArchitecture.Core.Domain.Models.MusicSheet
 
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset ModifiedDate { get; set; }
+        public MusicSheetUIState MusicSheetUIState { get; set; }
     }
 }

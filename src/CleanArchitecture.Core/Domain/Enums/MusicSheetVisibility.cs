@@ -3,6 +3,6 @@
     public enum MusicSheetVisibility
     {
         Private,
-        Public,
+        Public, // Default when created
     }
 }

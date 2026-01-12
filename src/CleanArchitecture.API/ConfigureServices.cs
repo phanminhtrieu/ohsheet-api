@@ -21,6 +21,7 @@ namespace CleanArchitecture.API
         public static IServiceCollection AddWebAPIService(this IServiceCollection services, AppSettings appSettings)
         {
             services.AddControllers();
+            services.AddHttpContextAccessor();
             services.AddEndpointsApiExplorer();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddFluentValidationAutoValidation();

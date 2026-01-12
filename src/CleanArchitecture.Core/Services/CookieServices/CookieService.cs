@@ -6,10 +6,9 @@ namespace CleanArchitecture.Core.Services.CookieServices
 {
     public class CookieService(IHttpContextAccessor _httpContextAccessor) : ICookieService
     {
-        public string Get()
+        public string? Get()
         {
-            var token = _httpContextAccessor.HttpContext?.Request.Cookies["token_key"];
-            return string.IsNullOrEmpty(token) ? throw UserException.UserUnauthorizedException() : token;
+            return _httpContextAccessor.HttpContext?.Request.Cookies["token_key"];
         }
 
         public void Set(string token)

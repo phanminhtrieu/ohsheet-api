@@ -1,5 +1,4 @@
 ﻿using CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate;
-using CleanArchitecture.Core.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Core.Domain.Models.MusicSheet
@@ -15,6 +14,7 @@ namespace CleanArchitecture.Core.Domain.Models.MusicSheet
         public int Status { get; set; } // Draft | Published | Deleted
         public int MusicSheetVisibility { get; set; } // Private | Public
         public IFormFile? MidiFile { get; set; }
+        public IFormFile? ThumbnailFile { get; set; }
         public int ViewCount { get; set; } = 0;
         public int LikeCount { get; set; } = 0;
         public int CommentCount { get; set; } = 0;

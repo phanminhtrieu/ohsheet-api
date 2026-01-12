@@ -32,6 +32,7 @@ namespace CleanArchitecture.API.Extensions
                 //await initialize.InitializeAsync();
             }
 
+            app.UseStaticFiles();
             app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
             app.ConfigureExceptionHandler(loggerFactory.CreateLogger("Exceptions"));
             app.UseMiddleware<LoggingMiddleware>();

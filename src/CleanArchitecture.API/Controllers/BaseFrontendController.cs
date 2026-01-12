@@ -5,7 +5,7 @@ namespace CleanArchitecture.API.Controllers
 {
     [Route("api/frontend/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class BaseFrontendController : Controller
     {
     }

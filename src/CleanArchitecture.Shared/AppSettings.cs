@@ -12,6 +12,7 @@ namespace CleanArchitecture.Shared
         public FileStorageSettings FileStorageSettings { get; set; }
         public CloudinarySettings Cloudinary { get; set; }
         public PythonServiceSettings PythonServiceSettings { get; set; }
+        public AzureBlobSettings AzureBlob { get; set; }
         public bool UseInMemoryDatabase { get; set; }
         public string[] Cors { get; set; }
         public string BaseURL { get; set; }
@@ -91,5 +92,12 @@ namespace CleanArchitecture.Shared
         public string BaseUrl { get; set; } = string.Empty;
         public string InputFolder { get; set; } = string.Empty;
         public string OutputFolder { get; set; } = string.Empty;
+    }
+
+    public class AzureBlobSettings
+    {
+        public string? ConnectionString { get; set; }
+        public string? AccountName { get; set; }
+        public string? ContainerName { get; set; }
     }
 }
