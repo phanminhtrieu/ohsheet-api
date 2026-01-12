@@ -3,7 +3,7 @@
     public enum MusicSheetStatus
     {
         Draft,
-        Published,
+        Published, // Default when created
         Deleted
     }
 }

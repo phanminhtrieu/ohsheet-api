@@ -156,8 +156,8 @@ namespace CleanArchitecture.Core.Services.TokenService
                 ValidIssuer = _appSettings.Identity.Issuer,
                 ValidAudience = _appSettings.Identity.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Identity.Key)),
-                ValidateIssuer = true,
-                ValidateAudience = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
                 ValidateLifetime = false,
                 ValidateIssuerSigningKey = true
             };

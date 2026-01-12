@@ -11,6 +11,8 @@ using CleanArchitecture.Infrastructure.Services.BackgroundJobs.MusicSheetViewCou
 using CleanArchitecture.Infrastructure.Services.Caching;
 using CleanArchitecture.Infrastructure.Services.FileStorangeServices;
 using CleanArchitecture.Shared;
+using CleanArchitecture.Core.Interfaces.UserServices;
+using CleanArchitecture.Infrastructure.Services.UserServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +54,9 @@ namespace CleanArchitecture.Infrastructure
 
             // Inject unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork<AppDbContext>>();
+
+            // Current User Service
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             // Inject service providers
             services.AddTransient<IAzureBlobService, AzureBlobService>();

@@ -87,8 +87,8 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
                 title, 
                 description, 
                 false, // IsForked default
-                0, // Status default (Draft)
-                0, // Visibility default (Private)
+                (int)MusicSheetStatus.Published, // Status default
+                (int)MusicSheetVisibility.Public, // Visibility default
                 0, // ViewCount
                 0, // LikeCount
                 0, // CommentCount
@@ -134,12 +134,28 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             ModifiedDate = DateTimeOffset.UtcNow;
         }
 
-        public void AddLike(Guid userId, string content)
+        public void AddLike(Guid userId)
         {
+            if (_likes.Any(x => x.UserId == userId))
+            {
+                return;
+            }
+
             var like = new MusicSheetLike(this, userId);
             _likes.Add(like);
             LikeCount++;
             ModifiedDate = DateTimeOffset.UtcNow;
+        }
+
+        public void RemoveLike(Guid userId)
+        {
+            var like = _likes.FirstOrDefault(x => x.UserId == userId);
+            if (like != null)
+            {
+                _likes.Remove(like);
+                LikeCount--;
+                ModifiedDate = DateTimeOffset.UtcNow;
+            }
         }
 
         public void AddTag(MusicSheetTag tag)
