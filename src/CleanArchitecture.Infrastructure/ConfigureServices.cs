@@ -48,7 +48,6 @@ namespace CleanArchitecture.Infrastructure
                 options.UseSqlServer(appSettings.ConnectionStrings.DefaultConnection);
                 options.AddInterceptors(eventDispatchInterceptor);
             });
-
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
@@ -89,6 +88,7 @@ namespace CleanArchitecture.Infrastructure
             services.AddTransient<IAnonymousSubscriptionRepository, AnonymousSubscriptionRepository>();
             services.AddTransient<IAnonymousFeedbackRepository, AnonymousFeedbackRepository>();
             services.AddTransient<IMusicSheetRepository, MusicSheetRepository>();
+            services.AddTransient<IRecentlyViewedRepository, RecentlyViewedRepository>();
 
             return services;
         }

@@ -39,6 +39,8 @@ namespace CleanArchitecture.Infrastructure.Data
         public DbSet<MusicSheetTag> MusicSheetTags {  get; set; }
 
 
+        public DbSet<RecentlyViewedMusicSheet> RecentlyViewedMusicSheets { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

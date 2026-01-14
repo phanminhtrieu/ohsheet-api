@@ -3,10 +3,11 @@ using CleanArchitecture.UseCases.MusicSheets;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CleanArchitecture.Core.Interfaces.UserServices;
 
 namespace CleanArchitecture.API.Controllers.Frontend
 {
-    public class MusicSheetController(IMediator _mediator) : BaseFrontendController
+    public class MusicSheetController(IMediator _mediator, ICurrentUserService _currentUserService) : BaseFrontendController
     {
         /// <summary>
         /// Get music sheet by Id
@@ -113,6 +114,26 @@ namespace CleanArchitecture.API.Controllers.Frontend
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Record music sheet view
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPost("{id}/view")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RecordView(int id, CancellationToken cancellationToken)
+        {
+            if (!_currentUserService.UserGuid.HasValue)
+            {
+                return Ok(); // Silent success for unauthenticated
+            }
+
+            var command = new RecordMusicSheetViewCommand(id, _currentUserService.UserGuid.Value);
+            await _mediator.Send(command, cancellationToken);
+            return Ok();
         }
     }
 }

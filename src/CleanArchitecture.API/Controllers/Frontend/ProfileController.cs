@@ -3,12 +3,13 @@ using CleanArchitecture.Shared.CrossCuttingConcerns.Dtos.Paging;
 using CleanArchitecture.UseCases.Profile;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CleanArchitecture.Core.Interfaces.UserServices;
 
 namespace CleanArchitecture.API.Controllers.Frontend
 {
     [Route("api/frontend/[controller]")]
 [ApiController]
-public class ProfileController(IMediator _mediator) : BaseFrontendController
+public class ProfileController(IMediator _mediator, ICurrentUserService _currentUserService) : BaseFrontendController
     {
         /// <summary>
         /// Get current user profile
@@ -55,6 +56,25 @@ public class ProfileController(IMediator _mediator) : BaseFrontendController
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get recently viewed music sheets
+        /// </summary>
+        /// <param name="limit"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("me/recently-viewed")]
+        public async Task<IActionResult> GetRecentlyViewed([FromQuery] int limit, CancellationToken cancellationToken)
+        {
+            if (!_currentUserService.UserGuid.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            var query = new GetRecentlyViewedMusicSheetsQuery(_currentUserService.UserGuid.Value, limit);
+            var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
     }
