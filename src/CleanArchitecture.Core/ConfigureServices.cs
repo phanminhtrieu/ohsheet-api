@@ -14,6 +14,8 @@ using CleanArchitecture.Core.Services.MailServices;
 using CleanArchitecture.Core.Services.MusicSheetServices;
 using CleanArchitecture.Core.Services.MusicTranscriptionServices;
 using CleanArchitecture.Core.Services.TokenService;
+using CleanArchitecture.Core.Interfaces.UserServices;
+using CleanArchitecture.Core.Services.UserServices;
 using CleanArchitecture.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -44,6 +46,9 @@ namespace CleanArchitecture.Core
             // MusicSheet
             services.AddTransient<IMusicSheetService, MusicSheetService>();
             services.AddTransient<IMusicSheetViewService, MusicSheetViewService>();
+
+            // Profile
+            services.AddTransient<IProfileService, ProfileService>();
 
             return services;
         }

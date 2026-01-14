@@ -71,8 +71,8 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                     IsForked = x.ms.IsForked,
                     CreatedDate = x.ms.CreatedDate,
                     ModifiedDate = x.ms.ModifiedDate,
-                    UploaderName = x.u != null ? (x.u.FirstName + " " + x.u.LastName).Trim() : string.Empty,
-                    UploaderAvatar = x.u != null ? x.u.Avatar : string.Empty,
+                    UploaderName = x.u != null ? (!string.IsNullOrEmpty(x.u.DisplayName) ? x.u.DisplayName : (x.u.FirstName + " " + x.u.LastName).Trim()) : string.Empty,
+                    UploaderAvatar = x.u != null ? (!string.IsNullOrEmpty(x.u.AvatarUrl) ? x.u.AvatarUrl : x.u.Avatar) : string.Empty,
                     MusicSheetUIState = new MusicSheetUIState
                     {
                         IsLiked = userId.HasValue && x.ms.Likes.Any(l => l.UserId == userId.Value)
@@ -112,8 +112,8 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                             Tags = ms.Tags,
                             CreatedDate = ms.CreatedDate,
                             ModifiedDate = ms.ModifiedDate,
-                            UploaderName = u != null ? (u.FirstName + " " + u.LastName).Trim() : string.Empty,
-                            UploaderAvatar = u != null ? u.Avatar : string.Empty,
+                            UploaderName = u != null ? (!string.IsNullOrEmpty(u.DisplayName) ? u.DisplayName : (u.FirstName + " " + u.LastName).Trim()) : string.Empty,
+                            UploaderAvatar = u != null ? (!string.IsNullOrEmpty(u.AvatarUrl) ? u.AvatarUrl : u.Avatar) : string.Empty,
                             MusicSheetUIState = new MusicSheetUIState
                             {
                                 IsLiked = userId.HasValue && ms.Likes.Any(l => l.UserId == userId.Value)
@@ -128,6 +128,55 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
             return await _context.MusicSheets
                 .Include(x => x.Likes)
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
+
+        public async Task<DataTablePagedResult<MusicSheetResponse>> ListLikedByPagingAsync(PagingRequestBase request, Guid userId, CancellationToken cancellationToken)
+        {
+            var musicSheetQuery = _context.MusicSheets.AsNoTracking().AsQueryable();
+            var userQuery = _context.ApplicatioUsers.AsNoTracking().AsQueryable();
+            var likeQuery = _context.MusicSheetLikes.AsNoTracking().Where(l => l.UserId == userId);
+
+            var query = from l in likeQuery
+                        join ms in musicSheetQuery on l.MusicSheetId equals ms.Id
+                        join u in userQuery on ms.UserId equals u.Id into userGroup
+                        from u in userGroup.DefaultIfEmpty()
+                        select new { ms, u };
+
+            var totalRecords = await query.CountAsync(cancellationToken);
+
+            var pageIndex = request.PageIndex ?? 1;
+            var pageSize = request.PageSize;
+            var items = await query
+                .OrderByDescending(x => x.ms.ModifiedDate)
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new MusicSheetResponse
+                {
+                    Id = x.ms.Id,
+                    Title = x.ms.Title.Value,
+                    ParentId = x.ms.ParentId,
+                    Description = x.ms.Description,
+                    TranscriptionId = x.ms.TranscriptionId,
+                    Thumbnail = x.ms.Thumbnail,
+                    Status = x.ms.Status,
+                    MusicSheetVisibility = x.ms.MusicSheetVisibility,
+                    ViewCount = x.ms.ViewCount,
+                    LikeCount = x.ms.LikeCount,
+                    CommentCount = x.ms.CommentCount,
+                    ShareCount = x.ms.ShareCount,
+                    IsForked = x.ms.IsForked,
+                    CreatedDate = x.ms.CreatedDate,
+                    ModifiedDate = x.ms.ModifiedDate,
+                    UploaderName = x.u != null ? (!string.IsNullOrEmpty(x.u.DisplayName) ? x.u.DisplayName : (x.u.FirstName + " " + x.u.LastName).Trim()) : string.Empty,
+                    UploaderAvatar = x.u != null ? (!string.IsNullOrEmpty(x.u.AvatarUrl) ? x.u.AvatarUrl : x.u.Avatar) : string.Empty,
+                    MusicSheetUIState = new MusicSheetUIState
+                    {
+                        IsLiked = true // Since we are filtering by likes for this user
+                    }
+                })
+                .ToListAsync(cancellationToken);
+
+            return new DataTablePagedResult<MusicSheetResponse>(items, pageIndex, pageSize, totalRecords);
         }
 
         public async Task IncrementViewCountAsync(int id, int incrementBy)
