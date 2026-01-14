@@ -16,9 +16,10 @@ namespace CleanArchitecture.Core.Services.CookieServices
                     new CookieOptions
                     {
                         HttpOnly = true,
-                        SameSite = SameSiteMode.None,
-                        Secure = true,
-                        MaxAge = TimeSpan.FromMinutes(30)
+                        SameSite = SameSiteMode.Lax, // Changed from None to Lax for HTTP compatibility
+                        Secure = false, // Changed from true to false for HTTP development
+                        MaxAge = TimeSpan.FromMinutes(30),
+                        Path = "/"
                     });
 
         public void Delete() => _httpContextAccessor.HttpContext?.Response.Cookies.Delete("token_key");

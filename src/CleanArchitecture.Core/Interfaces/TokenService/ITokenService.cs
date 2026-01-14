@@ -6,7 +6,7 @@ namespace CleanArchitecture.Core.Interfaces.TokenService
 {
     public interface ITokenService
     {
-        string GenerateToken(ApplicationUser user);
+        Task<string> GenerateToken(ApplicationUser user);
         ClaimsPrincipal ValidateToken(string token);
         Task<TokenResult> GenerateToken(ApplicationUser user, string[] scopes, CancellationToken cancellationToken);
     }

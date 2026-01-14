@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.API.Middlewares;
 using CleanArchitecture.Core;
 using CleanArchitecture.Infrastructure;
+using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Shared;
 
 namespace CleanArchitecture.API.Extensions
@@ -28,8 +29,7 @@ namespace CleanArchitecture.API.Extensions
 
             if (!appSettings.UseInMemoryDatabase)
             {
-                //var initialize = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
-                //await initialize.InitializeAsync();
+                await DbInitializer.SeedAsync(app.Services);
             }
 
             app.UseStaticFiles();

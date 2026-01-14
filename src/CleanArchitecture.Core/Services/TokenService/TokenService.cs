@@ -20,16 +20,24 @@ namespace CleanArchitecture.Core.Services.TokenService
         IUnitOfWork _unitOfWork,
         UserManager<ApplicationUser> _userManager) : ITokenService
     {
-        public string GenerateToken(ApplicationUser user)
+        public async Task<string> GenerateToken(ApplicationUser user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Identity.Key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
+            
+            var roles = await _userManager.GetRolesAsync(user);
+            
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                //new Claim(ClaimTypes.Role, user.Role.ToString()), // TODO: Add role
+                new Claim(ClaimTypes.Name, user.UserName)
             };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var token = new JwtSecurityToken(
                     claims: claims,
@@ -48,15 +56,19 @@ namespace CleanArchitecture.Core.Services.TokenService
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Uri, user?.Avatar ?? "default.png"),
-            //new Claim(ClaimTypes.Role, roles == null ? Role.User.ToString() : string.Join(";", roles)), // TODO: Add role
-            new Claim("scope", string.Join(" ", scopes)) // Adding scope claim
-        };
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Uri, user?.Avatar ?? "default.png"),
+                new Claim("scope", string.Join(" ", scopes))
+            };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Identity.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

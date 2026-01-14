@@ -5,7 +5,7 @@ namespace CleanArchitecture.API.Controllers
 {
     [Route("api/backoffice/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize(Roles = "Admin, Moderator")]
     public class BaseBackOfficeController : Controller
     {
     }

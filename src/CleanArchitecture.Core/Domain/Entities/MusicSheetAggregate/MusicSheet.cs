@@ -187,6 +187,18 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             }
             ModifiedDate = DateTimeOffset.UtcNow;
         }
+
+        public void SetStatus(MusicSheetStatus status)
+        {
+            Status = status;
+            ModifiedDate = DateTimeOffset.UtcNow;
+        }
+
+        public void SetVisibility(MusicSheetVisibility visibility)
+        {
+            MusicSheetVisibility = visibility;
+            ModifiedDate = DateTimeOffset.UtcNow;
+        }
     }
 
     [Owned]
