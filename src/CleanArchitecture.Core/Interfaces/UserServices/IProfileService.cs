@@ -10,5 +10,6 @@ namespace CleanArchitecture.Core.Interfaces.UserServices
         Task<ApiResult<UserProfileDto>> GetMyProfileAsync();
         Task<ApiResult<bool>> UpdateMyProfileAsync(UpdateUserProfileRequest request);
         Task<ApiResult<DataTablePagedResult<MusicSheetResponse>>> GetMyLikedSheetsAsync(PagingRequestBase request, CancellationToken cancellationToken);
+        Task<ApiResult<DataTablePagedResult<MusicSheetResponse>>> GetMySheetsAsync(PagingRequestBase request, CancellationToken cancellationToken);
     }
 }

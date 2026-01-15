@@ -82,5 +82,15 @@ namespace CleanArchitecture.Core.Services.UserServices
 
             return new ApiSuccessResult<DataTablePagedResult<MusicSheetResponse>>(pagedResult);
         }
+
+        public async Task<ApiResult<DataTablePagedResult<MusicSheetResponse>>> GetMySheetsAsync(PagingRequestBase request, CancellationToken cancellationToken)
+        {
+            var userId = _currentUserService.UserGuid;
+            if (userId == null) throw new UserFriendlyException(ErrorCode.Unauthorized, "User not authenticated", "User not authenticated");
+
+            var pagedResult = await _musicSheetRepository.ListByAuthorPagingAsync(request, userId.Value, cancellationToken);
+
+            return new ApiSuccessResult<DataTablePagedResult<MusicSheetResponse>>(pagedResult);
+        }
     }
 }

@@ -60,6 +60,23 @@ public class ProfileController(IMediator _mediator, ICurrentUserService _current
         }
 
         /// <summary>
+        /// Get music sheets uploaded by current user
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("me/sheets")]
+        public async Task<IActionResult> GetMySheets([FromQuery] PagingRequestBase request, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetMySheetsQuery(request), cancellationToken);
+            if (!result.IsSucceeded)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Get recently viewed music sheets
         /// </summary>
         /// <param name="limit"></param>
