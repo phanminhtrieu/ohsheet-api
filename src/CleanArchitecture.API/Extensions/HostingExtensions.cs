@@ -2,6 +2,7 @@
 using CleanArchitecture.Core;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Data;
+using CleanArchitecture.Infrastructure.Hubs;
 using CleanArchitecture.Shared;
 
 namespace CleanArchitecture.API.Extensions
@@ -16,6 +17,8 @@ namespace CleanArchitecture.API.Extensions
 
             //MediatR
             builder.Services.AddMediatrConfigs();
+
+            builder.Services.AddSignalR();
 
             return builder.Build();
         }
@@ -43,6 +46,7 @@ namespace CleanArchitecture.API.Extensions
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+            app.MapHub<NotificationHub>("/notificationHub");
 
             return app;
         }

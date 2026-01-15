@@ -40,6 +40,7 @@ namespace CleanArchitecture.Infrastructure.Data
 
 
         public DbSet<RecentlyViewedMusicSheet> RecentlyViewedMusicSheets { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

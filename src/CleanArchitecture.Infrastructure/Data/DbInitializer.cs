@@ -1,6 +1,7 @@
 using CleanArchitecture.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanArchitecture.Infrastructure.Data
 {
@@ -9,6 +10,9 @@ namespace CleanArchitecture.Infrastructure.Data
         public static async Task SeedAsync(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await context.Database.MigrateAsync();
+
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 

@@ -247,5 +247,47 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
             await _context.Database
                 .ExecuteSqlInterpolatedAsync($"UPDATE MusicSheets SET ViewCount = ViewCount + {incrementBy} WHERE Id = {id}");
         }
+
+        public async Task<List<CommentModel>> GetCommentsAsync(int musicSheetId, CancellationToken cancellationToken)
+        {
+            var comments = await (from c in _context.MusicSheetComments.AsNoTracking()
+                                  join u in _context.ApplicatioUsers.AsNoTracking() on c.UserId equals u.Id into userGroup
+                                  from u in userGroup.DefaultIfEmpty()
+                                  where c.MusicSheetId == musicSheetId
+                                  select new CommentModel
+                                  {
+                                      Id = c.Id,
+                                      MusicSheetId = c.MusicSheetId,
+                                      UserId = c.UserId,
+                                      UserName = u != null ? (!string.IsNullOrEmpty(u.DisplayName) ? u.DisplayName : (u.FirstName + " " + u.LastName).Trim()) : "Unknown",
+                                      UserAvatar = u != null ? (!string.IsNullOrEmpty(u.AvatarUrl) ? u.AvatarUrl : u.Avatar) : string.Empty,
+                                      Content = c.Content,
+                                      CreatedAt = c.CreatedAt,
+                                      ParentId = c.ParentId
+                                  }).ToListAsync(cancellationToken);
+
+            var lookup = comments.ToLookup(c => c.ParentId);
+            
+            foreach (var comment in comments)
+            {
+                comment.Replies = lookup[comment.Id].OrderBy(c => c.CreatedAt).ToList();
+            }
+
+            return lookup[null].OrderByDescending(c => c.CreatedAt).ToList();
+        }
+
+        public async Task<MusicSheet?> GetWithCommentAsync(int musicSheetId, int commentId, CancellationToken cancellationToken)
+        {
+            return await _context.MusicSheets
+                .Include(x => x.Comments.Where(c => c.Id == commentId))
+                .FirstOrDefaultAsync(x => x.Id == musicSheetId, cancellationToken);
+        }
+
+        public async Task<MusicSheet?> GetCommentReadOnlyAsync(int musicSheetId, int commentId, CancellationToken cancellationToken)
+        {
+            return await _context.MusicSheets.AsNoTracking()
+                .Include(x => x.Comments.Where(c => c.Id == commentId))
+                .FirstOrDefaultAsync(x => x.Id == musicSheetId, cancellationToken);
+        }
     }
 }

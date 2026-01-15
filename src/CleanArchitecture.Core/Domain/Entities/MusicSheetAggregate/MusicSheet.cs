@@ -136,12 +136,34 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             ModifiedDate = DateTimeOffset.UtcNow;
         }
 
-        public void AddComment(Guid userId, string content)
+        public MusicSheetComment AddComment(Guid userId, string content, int? parentId = null)
         {
-            var comment = new MusicSheetComment(this, userId, content);
+            var comment = new MusicSheetComment(this, userId, content, parentId);
             _comments.Add(comment);
             CommentCount++;
             ModifiedDate = DateTimeOffset.UtcNow;
+            return comment;
+        }
+
+
+
+        public void RemoveComment(int commentId, Guid userId)
+        {
+            var comment = _comments.FirstOrDefault(x => x.Id == commentId);
+            if (comment != null)
+            {
+                // Ensure only owner can delete (or admin, but here we check userId)
+                if (comment.UserId != userId)
+                {
+                    // Throw exception or ignore? 
+                    // For domain logic, maybe throw.
+                    throw new UnauthorizedAccessException("Not authorized to delete this comment.");
+                }
+
+                _comments.Remove(comment);
+                CommentCount--;
+                ModifiedDate = DateTimeOffset.UtcNow;
+            }
         }
 
         public void AddLike(Guid userId)

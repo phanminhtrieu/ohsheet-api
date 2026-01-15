@@ -13,5 +13,8 @@ namespace CleanArchitecture.Core.Repositories
         Task<MusicSheetResponse?> GetDetailByIdAsync(int id, Guid? userId);
         Task<MusicSheet?> GetWithLikesAsync(int id, CancellationToken cancellationToken);
         Task IncrementViewCountAsync(int id, int incrementBy);
+        Task<List<CommentModel>> GetCommentsAsync(int musicSheetId, CancellationToken cancellationToken);
+        Task<MusicSheet?> GetWithCommentAsync(int musicSheetId, int commentId, CancellationToken cancellationToken);
+        Task<MusicSheet?> GetCommentReadOnlyAsync(int musicSheetId, int commentId, CancellationToken cancellationToken);
     }
 }

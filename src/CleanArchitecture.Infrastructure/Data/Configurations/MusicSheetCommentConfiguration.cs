@@ -11,6 +11,11 @@ namespace CleanArchitecture.Infrastructure.Data.Configurations
             builder.ToTable("MusicSheetComments");
 
             builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Parent)
+                .WithMany(x => x.Replies)
+                .HasForeignKey(x => x.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

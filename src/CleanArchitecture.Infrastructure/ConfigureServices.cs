@@ -104,6 +104,7 @@ namespace CleanArchitecture.Infrastructure
             services.AddTransient<IAnonymousFeedbackRepository, AnonymousFeedbackRepository>();
             services.AddTransient<IMusicSheetRepository, MusicSheetRepository>();
             services.AddTransient<IRecentlyViewedRepository, RecentlyViewedRepository>();
+            services.AddTransient<INotificationRepository, NotificationRepository>();
 
             return services;
         }
