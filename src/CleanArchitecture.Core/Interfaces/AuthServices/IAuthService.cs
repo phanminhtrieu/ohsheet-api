@@ -9,6 +9,7 @@ namespace CleanArchitecture.Core.Interfaces.AuthServices
         Task<ApiResult<UserSignUpResponse>> SignUp(UserSignUpRequest request, CancellationToken cancellationToken);
         bool Logout();
         Task<ApiResult<string>> RefreshToken();
+        Task<ApiResult<UserSignInResponse>> RefreshToken(string refreshToken);
         Task<ApiResult<UserProfileResponse>> GetProfile(CancellationToken cancellationToken);
     }
 }

@@ -20,7 +20,7 @@ namespace CleanArchitecture.Core.Services.TokenService
         IUnitOfWork _unitOfWork,
         UserManager<ApplicationUser> _userManager) : ITokenService
     {
-        public async Task<string> GenerateToken(ApplicationUser user)
+        public async Task<TokenResult> GenerateToken(ApplicationUser user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Identity.Key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -39,15 +39,28 @@ namespace CleanArchitecture.Core.Services.TokenService
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
+            var expires = DateTime.UtcNow.AddMinutes(_appSettings.Identity.ExpiredTime);
+
             var token = new JwtSecurityToken(
                     claims: claims,
-                    expires: DateTime.UtcNow.AddDays(1),
+                    expires: expires,
                     audience: _appSettings.Identity.Audience,
                     issuer: _appSettings.Identity.Issuer,
                     signingCredentials: credentials
                 );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenResult = new JwtSecurityTokenHandler().WriteToken(token);
+            var refreshToken = this.GenerateRefreshToken();
+
+            await this.SaveRefreshToken(user.Id, refreshToken, DateTime.UtcNow.AddDays(7));
+
+            return new TokenResult
+            {
+                UserId = user.Id,
+                Token = tokenResult,
+                RefreshToken = refreshToken,
+                Expires = expires
+            };
         }
 
         public async Task<TokenResult> GenerateToken(ApplicationUser user, string[] scopes, CancellationToken cancellationToken)
@@ -73,7 +86,7 @@ namespace CleanArchitecture.Core.Services.TokenService
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.Identity.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var expires = DateTime.UtcNow.AddDays(_appSettings.Identity.ExpiredTime);
+            var expires = DateTime.UtcNow.AddMinutes(_appSettings.Identity.ExpiredTime);
 
             var token = new JwtSecurityToken(
                 issuer: _appSettings.Identity.Issuer,
@@ -83,81 +96,21 @@ namespace CleanArchitecture.Core.Services.TokenService
                 signingCredentials: creds);
 
             var tokenResult = new JwtSecurityTokenHandler().WriteToken(token);
+            var refreshToken = this.GenerateRefreshToken();
+
+            await this.SaveRefreshToken(user.Id, refreshToken, DateTime.UtcNow.AddDays(7));
 
             result.UserId = user.Id;
             result.Expires = expires;
             result.Token = tokenResult;
-
-            var refreshToken = new RefreshToken
-            {
-                Token = tokenResult,
-                UserId = user.Id,
-                Expires = expires,
-                Created = DateTime.UtcNow
-            };
-            var checkToken = await _refreshTokenRepository.FindAsync(r => r.UserId == user.Id);
-
-            var isRefreshTokenExist = checkToken != null;
-            var isRefreshTokenValid = isRefreshTokenExist && (checkToken.Expires > DateTime.UtcNow);
-
-            // TODO: Use switch case
-            if (!isRefreshTokenExist)
-            {
-                await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
-                try
-                {
-                    await _refreshTokenRepository.AddAsync(refreshToken);
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    await transaction.CommitAsync(cancellationToken);
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    throw;
-                }
-            }
-            else if (isRefreshTokenValid)
-            {
-                checkToken.Token = tokenResult;
-                checkToken.Expires = expires;
-                checkToken.Created = DateTime.UtcNow;
-
-                await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
-                try
-                {
-                    _refreshTokenRepository.Update(refreshToken);
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                    await transaction.CommitAsync(cancellationToken);
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    throw;
-                }
-
-            }
-            // If refresh token is exist and expired, then delete it and add new one
-            else
-            {
-                await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
-                try
-                {
-                    _refreshTokenRepository.Remove(refreshToken);
-                    await _refreshTokenRepository.AddAsync(refreshToken);
-
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-                    await transaction.CommitAsync(cancellationToken);
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync(cancellationToken);
-                    throw;
-                }
-            }
+            result.RefreshToken = refreshToken;
 
             return result;
+        }
+
+        public async Task<CleanArchitecture.Core.Domain.Entities.RefreshToken.RefreshToken?> ValidateRefreshToken(string token)
+        {
+            return await _refreshTokenRepository.FindAsync(r => r.Token == token);
         }
 
         public ClaimsPrincipal ValidateToken(string token)
@@ -177,6 +130,41 @@ namespace CleanArchitecture.Core.Services.TokenService
             var principal = new JwtSecurityTokenHandler().ValidateToken(token, validationParameters, out _);
 
             return principal;
+        }
+
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        private async Task SaveRefreshToken(Guid userId, string token, DateTime expires)
+        {
+            var refreshToken = new RefreshToken
+            {
+                Token = token,
+                UserId = userId,
+                Expires = expires,
+                Created = DateTime.UtcNow
+            };
+
+            var checkToken = await _refreshTokenRepository.FindAsync(r => r.UserId == userId);
+
+            if (checkToken == null)
+            {
+                await _refreshTokenRepository.AddAsync(refreshToken);
+            }
+            else
+            {
+                checkToken.Token = token;
+                checkToken.Expires = expires;
+                checkToken.Created = DateTime.UtcNow;
+                _refreshTokenRepository.Update(checkToken);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

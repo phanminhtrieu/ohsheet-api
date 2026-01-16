@@ -48,16 +48,31 @@ namespace CleanArchitecture.API.Controllers.Frontend
             return Ok(result);
         }
 
-        /// <summary>
-        /// Log out
-        /// </summary>
-        /// <returns></returns>
         [HttpDelete("logout")]
         public async Task<IActionResult> Logout()
         {
             var result = await _mediator.Send(new LogoutCommand());
 
             if (!result)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Refresh token
+        /// </summary>
+        /// <param name="refreshToken"></param>
+        /// <returns></returns>
+        [HttpPost("refresh-token")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            var result = await _mediator.Send(new RefreshTokenCommand(request));
+
+            if (!result.IsSucceeded)
             {
                 return BadRequest(result);
             }

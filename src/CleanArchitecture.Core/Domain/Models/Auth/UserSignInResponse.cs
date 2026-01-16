@@ -10,6 +10,7 @@ namespace CleanArchitecture.Core.Domain.Models.Auth
         public string FirstName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty; // TODO: Use Enum
         public string Token { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
         public int AuditLoginId { get; set; }
     }
 }

@@ -58,10 +58,30 @@ namespace CleanArchitecture.Core.Services.AuthServices
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) throw UserException.InternalServerException();
 
-            var accessToken = await _tokenService.GenerateToken(user);
-            _cookieService.Set(accessToken);
+            var tokenResult = await _tokenService.GenerateToken(user);
+            _cookieService.Set(tokenResult.Token);
 
-            return new ApiSuccessResult<string>(accessToken);
+            return new ApiSuccessResult<string>(tokenResult.Token);
+        }
+
+        public async Task<ApiResult<UserSignInResponse>> RefreshToken(string refreshToken)
+        {
+            var refreshTokenEntity = await _tokenService.ValidateRefreshToken(refreshToken);
+            if (refreshTokenEntity == null || !refreshTokenEntity.IsActive)
+            {
+                throw UserException.UserUnauthorizedException();
+            }
+
+            var user = await _userManager.FindByIdAsync(refreshTokenEntity.UserId.ToString());
+            if (user == null) throw UserException.InternalServerException();
+
+            var tokenResult = await _tokenService.GenerateToken(user);
+            _cookieService.Set(tokenResult.Token);
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var response = this.MapToResponse(user, tokenResult.Token, tokenResult.RefreshToken, 0, roles.FirstOrDefault() ?? "User");
+
+            return new ApiSuccessResult<UserSignInResponse>(response);
         }
 
         public async Task<ApiResult<UserSignInResponse>> SignIn(UserSignInRequest request)
@@ -100,13 +120,13 @@ namespace CleanArchitecture.Core.Services.AuthServices
 
             auditLoginId = await this.SaveUserAuditLogin(auditLoginRequest);
 
-            var token = await _tokenService.GenerateToken(user);
-            _cookieService.Set(token);
+            var tokenResult = await _tokenService.GenerateToken(user);
+            _cookieService.Set(tokenResult.Token);
 
             await this.UpdateUserLastSignInDate(user);
 
             var roles = await _userManager.GetRolesAsync(user);
-            var response = this.MapToResponse(user, token, auditLoginId, roles.FirstOrDefault() ?? "User");
+            var response = this.MapToResponse(user, tokenResult.Token, tokenResult.RefreshToken, auditLoginId, roles.FirstOrDefault() ?? "User");
 
             return new ApiSuccessResult<UserSignInResponse>(response);
         }
@@ -156,7 +176,7 @@ namespace CleanArchitecture.Core.Services.AuthServices
             return result.ResultObj;
         }
 
-        private UserSignInResponse MapToResponse(ApplicationUser user, string token, int auditLoginId, string role)
+        private UserSignInResponse MapToResponse(ApplicationUser user, string token, string refreshToken, int auditLoginId, string role)
         {
             var response = new UserSignInResponse
             {
@@ -166,6 +186,7 @@ namespace CleanArchitecture.Core.Services.AuthServices
                 FirstName = user.FirstName,
                 AuditLoginId = auditLoginId,
                 Token = token,
+                RefreshToken = refreshToken,
                 Role = role
             };
 

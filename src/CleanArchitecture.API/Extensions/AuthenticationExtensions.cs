@@ -42,7 +42,8 @@ namespace CleanArchitecture.API.Extensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = identitySettings.Issuer,
                     ValidAudience = identitySettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identitySettings.Key))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identitySettings.Key)),
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
@@ -88,6 +89,7 @@ namespace CleanArchitecture.API.Extensions
                     ValidAudience = identitySettings.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(identitySettings.Key)),
                     ValidateIssuerSigningKey = true,
+                    ClockSkew = TimeSpan.Zero
                 };
                 options.Authority = identitySettings.Issuer;
                 options.RequireHttpsMetadata = identitySettings.ValidateHttps;
