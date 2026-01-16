@@ -18,7 +18,7 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
 
         public async Task<DataTablePagedResult<MusicSheetResponse>> ListByPagingAsync(MusicSheetPagingRequest request, Guid? userId, CancellationToken cancellationToken)
         {
-            var musicSheetQuery = _context.MusicSheets.AsNoTracking().AsQueryable();
+            var musicSheetQuery = _context.MusicSheets.Include(x => x.Tags).AsNoTracking().AsQueryable();
             var userQuery = _context.ApplicatioUsers.AsNoTracking().AsQueryable();
 
             var query = from ms in musicSheetQuery
@@ -76,14 +76,31 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
             if (!isSorted && !string.IsNullOrEmpty(request.OrderCol) && !string.IsNullOrEmpty(request.OrderDir))
             {
                 var orderCol = request.OrderCol;
-                if (orderCol.Equals("Id", StringComparison.OrdinalIgnoreCase) || 
-                    orderCol.Equals("Title", StringComparison.OrdinalIgnoreCase) ||
-                    orderCol.Equals("ModifiedDate", StringComparison.OrdinalIgnoreCase))
+                if (orderCol.Equals("Title", StringComparison.OrdinalIgnoreCase))
                 {
+                    orderCol = "ms.Title.Value";
+                }
+                else if (orderCol.Equals("UploaderName", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Handle UploaderName sorting if needed, otherwise fallback to ms.CreatedDate
+                    orderCol = "ms.CreatedDate";
+                }
+                else
+                {
+                    // Default to prepending ms. for other columns
                     orderCol = "ms." + orderCol;
                 }
-                query = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(query, orderCol + " " + request.OrderDir);
-                isSorted = true;
+
+                try
+                {
+                    query = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(query, orderCol + " " + request.OrderDir);
+                    isSorted = true;
+                }
+                catch
+                {
+                    // Fallback if dynamic sorting fails
+                    isSorted = false;
+                }
             }
 
             if (!isSorted)

@@ -22,9 +22,9 @@ namespace CleanArchitecture.API.Controllers.Backoffice
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateMusicSheetCommand command, CancellationToken cancellationToken)
+        public async Task<IActionResult> Create([FromForm] CreateMusicSheetCommand command, [FromForm] List<string>? tags, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(command, cancellationToken);
+            var result = await _mediator.Send(command with { Tags = tags }, cancellationToken);
             if (!result.IsSucceeded)
             {
                 return BadRequest(result);
@@ -42,7 +42,8 @@ namespace CleanArchitecture.API.Controllers.Backoffice
                 request.TranscriptionId, 
                 request.Status, 
                 request.Visibility,
-                request.ThumbnailFile), cancellationToken);
+                request.ThumbnailFile,
+                request.Tags), cancellationToken);
             if (!result.IsSucceeded)
             {
                 return BadRequest(result);
@@ -71,6 +72,17 @@ namespace CleanArchitecture.API.Controllers.Backoffice
             }
             return Ok(result);
         }
+
+        [HttpGet("tags/search")]
+        public async Task<IActionResult> SearchTags([FromQuery] string query, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new CleanArchitecture.UseCases.MusicSheets.SearchTagsQuery(query), cancellationToken);
+            if (!result.IsSucceeded)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 
     public class UpdateMusicSheetRequest
@@ -81,6 +93,7 @@ namespace CleanArchitecture.API.Controllers.Backoffice
         public MusicSheetStatus Status { get; set; }
         public MusicSheetVisibility Visibility { get; set; }
         public IFormFile? ThumbnailFile { get; set; }
+        public List<string>? Tags { get; set; }
     }
 
     public class UpdateMusicSheetStatusRequest

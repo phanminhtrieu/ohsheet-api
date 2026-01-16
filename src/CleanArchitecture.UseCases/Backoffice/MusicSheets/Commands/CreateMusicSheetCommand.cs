@@ -5,6 +5,7 @@ using CleanArchitecture.Infrastructure.Data;
 using MediatR;
 using CleanArchitecture.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
+using CleanArchitecture.Core.Repositories;
 
 namespace CleanArchitecture.UseCases.Backoffice.MusicSheets.Commands
 {
@@ -15,9 +16,10 @@ namespace CleanArchitecture.UseCases.Backoffice.MusicSheets.Commands
         string? TranscriptionId,
         MusicSheetStatus Status,
         MusicSheetVisibility Visibility,
-        IFormFile? ThumbnailFile) : IRequest<ApiResult<int>>;
+        IFormFile? ThumbnailFile,
+        List<string>? Tags = null) : IRequest<ApiResult<int>>;
 
-    public class CreateMusicSheetCommandHandler(AppDbContext _context, IBlobService _blobService) : IRequestHandler<CreateMusicSheetCommand, ApiResult<int>>
+    public class CreateMusicSheetCommandHandler(AppDbContext _context, IBlobService _blobService, IMusicSheetRepository _musicSheetRepository) : IRequestHandler<CreateMusicSheetCommand, ApiResult<int>>
     {
         public async Task<ApiResult<int>> Handle(CreateMusicSheetCommand request, CancellationToken cancellationToken)
         {
@@ -37,6 +39,21 @@ namespace CleanArchitecture.UseCases.Backoffice.MusicSheets.Commands
 
             musicSheet.SetStatus(request.Status);
             musicSheet.SetVisibility(request.Visibility);
+
+            if (request.Tags != null && request.Tags.Any())
+            {
+                var existingTags = await _musicSheetRepository.GetTagsByNamesAsync(request.Tags, cancellationToken);
+                var existingTagNames = existingTags.Select(t => t.Name).ToList();
+                var newTagNames = request.Tags.Except(existingTagNames).ToList();
+
+                var allTags = new List<MusicSheetTag>(existingTags);
+                foreach (var tagName in newTagNames)
+                {
+                    allTags.Add(new MusicSheetTag(tagName));
+                }
+
+                musicSheet.AddTags(allTags);
+            }
 
             _context.MusicSheets.Add(musicSheet);
             await _context.SaveChangesAsync(cancellationToken);

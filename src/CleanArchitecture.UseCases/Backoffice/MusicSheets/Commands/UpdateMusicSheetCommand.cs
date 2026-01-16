@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using CleanArchitecture.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
+using CleanArchitecture.Core.Repositories;
 
 namespace CleanArchitecture.UseCases.Backoffice.MusicSheets.Commands
 {
@@ -16,13 +17,17 @@ namespace CleanArchitecture.UseCases.Backoffice.MusicSheets.Commands
         string? TranscriptionId,
         MusicSheetStatus Status,
         MusicSheetVisibility Visibility,
-        IFormFile? ThumbnailFile) : IRequest<ApiResult<bool>>;
+        IFormFile? ThumbnailFile,
+        List<string>? Tags = null) : IRequest<ApiResult<bool>>;
 
-    public class UpdateMusicSheetCommandHandler(AppDbContext _context, IBlobService _blobService) : IRequestHandler<UpdateMusicSheetCommand, ApiResult<bool>>
+    public class UpdateMusicSheetCommandHandler(AppDbContext _context, IBlobService _blobService, IMusicSheetRepository _musicSheetRepository) : IRequestHandler<UpdateMusicSheetCommand, ApiResult<bool>>
     {
         public async Task<ApiResult<bool>> Handle(UpdateMusicSheetCommand request, CancellationToken cancellationToken)
         {
-            var musicSheet = await _context.MusicSheets.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            var musicSheet = await _context.MusicSheets
+                .Include(x => x.Tags)
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+
             if (musicSheet == null)
             {
                 return new ApiErrorResult<bool>("Music Sheet not found.");
@@ -38,6 +43,21 @@ namespace CleanArchitecture.UseCases.Backoffice.MusicSheets.Commands
                 using var stream = request.ThumbnailFile.OpenReadStream();
                 var thumbnailUrl = await _blobService.UploadAsync(stream, request.ThumbnailFile.FileName, request.ThumbnailFile.ContentType);
                 musicSheet.SetThumbnail(thumbnailUrl);
+            }
+
+            if (request.Tags != null)
+            {
+                var existingTags = await _musicSheetRepository.GetTagsByNamesAsync(request.Tags, cancellationToken);
+                var existingTagNames = existingTags.Select(t => t.Name).ToList();
+                var newTagNames = request.Tags.Except(existingTagNames).ToList();
+
+                var allTags = new List<MusicSheetTag>(existingTags);
+                foreach (var tagName in newTagNames)
+                {
+                    allTags.Add(new MusicSheetTag(tagName));
+                }
+
+                musicSheet.UpdateTags(allTags);
             }
 
             await _context.SaveChangesAsync(cancellationToken);
