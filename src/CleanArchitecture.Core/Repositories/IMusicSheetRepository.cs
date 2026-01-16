@@ -16,5 +16,8 @@ namespace CleanArchitecture.Core.Repositories
         Task<List<CommentModel>> GetCommentsAsync(int musicSheetId, CancellationToken cancellationToken);
         Task<MusicSheet?> GetWithCommentAsync(int musicSheetId, int commentId, CancellationToken cancellationToken);
         Task<MusicSheet?> GetCommentReadOnlyAsync(int musicSheetId, int commentId, CancellationToken cancellationToken);
+        Task<List<MusicSheetTag>> GetTagsByNamesAsync(IEnumerable<string> names, CancellationToken cancellationToken);
+        Task<List<string>> SearchTagsAsync(string query, int maxResults, CancellationToken cancellationToken);
+        Task<MusicSheet?> GetWithTagsAsync(int id, CancellationToken cancellationToken);
     }
 }

@@ -28,6 +28,42 @@ namespace CleanArchitecture.API.Controllers.Frontend
         }
 
         /// <summary>
+        /// Create music sheet
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> Create([FromForm] MusicSheetRequest request, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new CreateMusicSheetCommand(request), cancellationToken);
+            if (!result.IsSucceeded)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Update music sheet
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateMusicSheet(int id, [FromForm] MusicSheetRequest request, CancellationToken cancellationToken)
+        {
+            var command = new UpdateMusicSheetCommand(id, request);
+            var result = await _mediator.Send(command, cancellationToken);
+            if (!result.IsSucceeded)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
         /// List music sheets by paging
         /// </summary>
         /// <param name="request"></param>
@@ -45,24 +81,6 @@ namespace CleanArchitecture.API.Controllers.Frontend
             return Ok(result);
         }
 
-        /// <summary>
-        /// Create music sheet
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancellationToken"></param> 
-        /// <returns></returns>
-        [HttpPost()]
-        public async Task<IActionResult> CreateMusicSheet([FromForm] MusicSheetRequest request, CancellationToken cancellationToken)
-        {
-            var result = await _mediator.Send(new CreateMusicSheetCommand(request), cancellationToken);
-
-            if (!result.IsSucceeded)
-            {
-                return BadRequest(result);
-            }
-
-            return Ok(result);
-        }
 
         /// <summary>
         /// Export sheet by html
@@ -134,6 +152,24 @@ namespace CleanArchitecture.API.Controllers.Frontend
             var command = new RecordMusicSheetViewCommand(id, _currentUserService.UserGuid.Value);
             await _mediator.Send(command, cancellationToken);
             return Ok();
+        }
+
+        /// <summary>
+        /// Search tags
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("tags/search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SearchTags([FromQuery] string query, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new SearchTagsQuery(query), cancellationToken);
+            if (!result.IsSucceeded)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace CleanArchitecture.Core.Domain.Models.MusicSheet
         public bool IsForked { get; set; }
         public List<MusicSheetComment>? Comments { get; set; }
         public List<MusicSheetLike>? Likes { get; set; }
-        public List<MusicSheetTag>? Tags { get; set; }
+        public List<string>? Tags { get; set; }
 
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset ModifiedDate { get; set; }

@@ -57,8 +57,72 @@ namespace CleanArchitecture.Core.Services.MusicSheetServices
                thumbnailUrl
            );
 
+            if (request.Tags != null && request.Tags.Any())
+            {
+                var normalizedTags = request.Tags
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .Select(t => t.Trim())
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                if (normalizedTags.Any())
+                {
+                    var existingTags = await _musicSheetRepository.GetTagsByNamesAsync(normalizedTags, cancellationToken);
+                    var existingTagNames = existingTags.Select(t => t.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                    var newTags = normalizedTags
+                        .Where(t => !existingTagNames.Contains(t))
+                        .Select(t => new MusicSheetTag(t))
+                        .ToList();
+
+                    musicSheet.AddTags(existingTags.Concat(newTags));
+                }
+            }
+
             await _musicSheetRepository.AddAsync(musicSheet);
 
+            return new ApiSuccessResult<int>(await _unitOfWork.SaveChangesAsync());
+        }
+
+        public async Task<ApiResult<int>> UpdateMusicSheetAsync(int id, MusicSheetRequest request, CancellationToken cancellationToken)
+        {
+            var userId = _currentUserService.UserGuid;
+            if (userId == null) return new ApiErrorResult<int>("User not authenticated");
+
+            var musicSheet = await _musicSheetRepository.GetWithTagsAsync(id, cancellationToken);
+
+            if (musicSheet == null) return new ApiErrorResult<int>("Music Sheet not found");
+
+            if (musicSheet.UserId != userId) return new ApiErrorResult<int>("You are not authorized to edit this music sheet");
+            musicSheet.UpdateMetadata(request.Title, request.Description);
+
+            if (request.Tags != null)
+            {
+                var normalizedTags = request.Tags
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .Select(t => t.Trim())
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                var existingTags = await _musicSheetRepository.GetTagsByNamesAsync(normalizedTags, cancellationToken);
+                var existingTagNames = existingTags.Select(t => t.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                var newTags = normalizedTags
+                    .Where(t => !existingTagNames.Contains(t))
+                    .Select(t => new MusicSheetTag(t))
+                    .ToList();
+
+                musicSheet.UpdateTags(existingTags.Concat(newTags));
+            }
+            else 
+            {
+                 if (request.Tags != null)
+                 {
+                     musicSheet.UpdateTags(new List<MusicSheetTag>());
+                 }
+            }
+            
+            _musicSheetRepository.Update(musicSheet);
             return new ApiSuccessResult<int>(await _unitOfWork.SaveChangesAsync());
         }
 

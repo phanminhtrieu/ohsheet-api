@@ -116,7 +116,7 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             ModifiedDate = DateTimeOffset.UtcNow;
         }
 
-        public void UpdateMetadata(string title, string description)
+        public void UpdateMetadata(string title, string? description)
         {
             Title = new MusicSheetTitle(title);
             Description = description;
@@ -207,6 +207,13 @@ namespace CleanArchitecture.Core.Domain.Entities.MusicSheetAggregate
             {
                 _tags.Add(tag);
             }
+            ModifiedDate = DateTimeOffset.UtcNow;
+        }
+
+        public void UpdateTags(IEnumerable<MusicSheetTag> tags)
+        {
+            _tags.Clear();
+            _tags.AddRange(tags);
             ModifiedDate = DateTimeOffset.UtcNow;
         }
 

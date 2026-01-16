@@ -95,6 +95,7 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                         select new MusicSheetResponse
                         {
                             Id = ms.Id,
+                            UserId = ms.UserId,
                             Title = ms.Title.Value,
                             ParentId = ms.ParentId,
                             Description = ms.Description,
@@ -109,7 +110,7 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                             ShareCount = ms.ShareCount,
                             IsForked = ms.IsForked,
                             Comments = ms.Comments,
-                            Tags = ms.Tags,
+                            Tags = ms.Tags.Select(t => t.Name).ToList(),
                             CreatedDate = ms.CreatedDate,
                             ModifiedDate = ms.ModifiedDate,
                             UploaderName = u != null ? (!string.IsNullOrEmpty(u.DisplayName) ? u.DisplayName : (u.FirstName + " " + u.LastName).Trim()) : string.Empty,
@@ -288,6 +289,30 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
             return await _context.MusicSheets.AsNoTracking()
                 .Include(x => x.Comments.Where(c => c.Id == commentId))
                 .FirstOrDefaultAsync(x => x.Id == musicSheetId, cancellationToken);
+        }
+        public async Task<List<MusicSheetTag>> GetTagsByNamesAsync(IEnumerable<string> names, CancellationToken cancellationToken)
+        {
+            return await _context.MusicSheetTags
+                .Where(t => names.Contains(t.Name))
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<string>> SearchTagsAsync(string query, int maxResults, CancellationToken cancellationToken)
+        {
+            return await _context.MusicSheetTags
+                .AsNoTracking()
+                .Where(t => t.Name.Contains(query))
+                .Select(t => t.Name)
+                .Distinct()
+                .Take(maxResults)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<MusicSheet?> GetWithTagsAsync(int id, CancellationToken cancellationToken)
+        {
+            return await _context.MusicSheets
+                .Include(x => x.Tags)
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
     }
 }

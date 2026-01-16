@@ -9,6 +9,8 @@ namespace CleanArchitecture.Infrastructure.Data.Configurations
         public void Configure(EntityTypeBuilder<MusicSheetTag> builder)
         {
             builder.ToTable("MusicSheetTags");
+            
+            builder.HasIndex(t => t.Name).IsUnique();
         }
     }
 }

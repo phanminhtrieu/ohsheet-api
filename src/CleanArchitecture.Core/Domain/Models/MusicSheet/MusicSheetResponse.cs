@@ -6,6 +6,7 @@ namespace CleanArchitecture.Core.Domain.Models.MusicSheet
     public class MusicSheetResponse
     {
         public int Id { get; set; }
+        public Guid UserId { get; set; }
         public string Title { get;  set; }
         public string UploaderName { get; set; } = string.Empty;
         public string UploaderAvatar { get; set; } = string.Empty;
@@ -23,7 +24,7 @@ namespace CleanArchitecture.Core.Domain.Models.MusicSheet
         public bool IsForked { get; set; }
         public IReadOnlyCollection<MusicSheetComment>? Comments { get; set; }
         public IReadOnlyCollection<MusicSheetLike>? Likes { get; set; }
-        public IReadOnlyCollection<MusicSheetTag>? Tags { get; set; }
+        public IReadOnlyCollection<string>? Tags { get; set; }
 
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset ModifiedDate { get; set; }
