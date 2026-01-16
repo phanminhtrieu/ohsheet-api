@@ -31,10 +31,49 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                 query = query.Where(x => x.ms.Title.Value.Contains(request.TextSearch));
             }
 
+            // Apply Tag filtering
+            if (request.Tags != null && request.Tags.Any())
+            {
+                query = query.Where(x => x.ms.Tags.Any(t => request.Tags.Contains(t.Name)));
+            }
+
+            // Apply Hot filters (Time window)
+            if (request.FilterBy == "hot_week")
+            {
+                var date = DateTimeOffset.UtcNow.AddDays(-7);
+                query = query.Where(x => x.ms.ModifiedDate >= date);
+            }
+            else if (request.FilterBy == "hot_month")
+            {
+                var date = DateTimeOffset.UtcNow.AddDays(-30);
+                query = query.Where(x => x.ms.ModifiedDate >= date);
+            }
+
             var totalRecords = await query.CountAsync(cancellationToken);
 
             // Apply sorting
-            if (!string.IsNullOrEmpty(request.OrderCol) && !string.IsNullOrEmpty(request.OrderDir))
+            bool isSorted = false;
+
+            if (!string.IsNullOrEmpty(request.FilterBy))
+            {
+                if (request.FilterBy == "top_like")
+                {
+                    query = query.OrderByDescending(x => x.ms.LikeCount).ThenByDescending(x => x.ms.ModifiedDate);
+                    isSorted = true;
+                }
+                else if (request.FilterBy == "newest")
+                {
+                    query = query.OrderByDescending(x => x.ms.CreatedDate);
+                    isSorted = true;
+                }
+                else if (request.FilterBy == "hot_week" || request.FilterBy == "hot_month")
+                {
+                    query = query.OrderByDescending(x => x.ms.LikeCount).ThenByDescending(x => x.ms.ViewCount);
+                    isSorted = true;
+                }
+            }
+
+            if (!isSorted && !string.IsNullOrEmpty(request.OrderCol) && !string.IsNullOrEmpty(request.OrderDir))
             {
                 var orderCol = request.OrderCol;
                 if (orderCol.Equals("Id", StringComparison.OrdinalIgnoreCase) || 
@@ -44,9 +83,13 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                     orderCol = "ms." + orderCol;
                 }
                 query = System.Linq.Dynamic.Core.DynamicQueryableExtensions.OrderBy(query, orderCol + " " + request.OrderDir);
+                isSorted = true;
             }
 
-            query = query.OrderByDescending(x => x.ms.LikeCount).ThenByDescending(x => x.ms.ModifiedDate);
+            if (!isSorted)
+            {
+                query = query.OrderByDescending(x => x.ms.LikeCount).ThenByDescending(x => x.ms.ModifiedDate);
+            }
 
             // Apply paging
             var pageIndex = request.PageIndex ?? 1;
@@ -76,7 +119,8 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                     MusicSheetUIState = new MusicSheetUIState
                     {
                         IsLiked = userId.HasValue && x.ms.Likes.Any(l => l.UserId == userId.Value)
-                    }
+                    },
+                    Tags = x.ms.Tags.Select(t => t.Name).ToList()
                 })
                 .ToListAsync(cancellationToken);
 
@@ -290,6 +334,7 @@ namespace CleanArchitecture.Infrastructure.Data.Repositories
                 .Include(x => x.Comments.Where(c => c.Id == commentId))
                 .FirstOrDefaultAsync(x => x.Id == musicSheetId, cancellationToken);
         }
+        
         public async Task<List<MusicSheetTag>> GetTagsByNamesAsync(IEnumerable<string> names, CancellationToken cancellationToken)
         {
             return await _context.MusicSheetTags
